@@ -1,32 +1,18 @@
 // ============================================================
 // MECADACTY — Configuration Firebase
-// Projet : mecadacty — Version du site : voir version.js
-// Étapes :
-//   1. Créer un projet sur https://console.firebase.google.com
-//      nommé "mecadacty"
-//   2. Activer Firestore Database (mode production)
-//   3. Copier ici la config du projet (Paramètres du projet >
-//      Général > Vos applications > Config)
-//   4. Créer le premier compte Super Admin directement dans
-//      Firestore, collection "utilisateurs" :
-//        identifiant: "HeleneL"
-//        motDePasse: "Helene123"
-//        role: "admin"
-//        estSuperAdmin: true
-//        nom: "Laruelle"
-//        prenom: "Hélène"
+// Projet réel : mecadacty-51f6f
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "A_COMPLETER",
-  authDomain: "mecadacty.firebaseapp.com",
-  projectId: "mecadacty",
-  storageBucket: "mecadacty.appspot.com",
-  messagingSenderId: "A_COMPLETER",
-  appId: "A_COMPLETER"
+  apiKey: "AIzaSyCe8JucgufbT8dGtX8I4BlVtLV_JT2kvBA",
+  authDomain: "mecadacty-51f6f.firebaseapp.com",
+  projectId: "mecadacty-51f6f",
+  storageBucket: "mecadacty-51f6f.firebasestorage.app",
+  messagingSenderId: "969429008237",
+  appId: "1:969429008237:web:2de2dbd15c94572f6ba464"
 };
 
 export const app = initializeApp(firebaseConfig);

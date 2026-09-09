@@ -91,6 +91,14 @@ a { color: var(--bleu-moyen); }
   width: auto;
 }
 
+.entete-marque img.logo-site-accueil {
+  height: 68px;
+}
+
+@media (max-width: 560px) {
+  .entete-marque img.logo-site-accueil { height: 52px; }
+}
+
 .entete-marque-soustitre {
   font-size: 0.74rem;
   color: var(--texte-doux);
@@ -359,6 +367,73 @@ nav.entete-nav a.actif {
   .bloc-presentation { flex-direction: column; align-items: center; text-align: center; }
 }
 
+/* ---------- Carte d'identité légale (société) ---------- */
+.carte-identite {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--ombre);
+  max-width: 480px;
+  margin: 20px 0;
+}
+
+.carte-identite-logo {
+  background: var(--bleu-profond);
+  width: 130px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.carte-identite-logo img {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--or);
+  background: var(--blanc);
+}
+
+.carte-identite-infos {
+  background: var(--blanc);
+  padding: 18px 22px;
+  flex: 1;
+}
+
+.carte-identite-infos h3 { margin-bottom: 2px; font-size: 1.1rem; }
+
+.carte-identite-societe {
+  color: var(--or);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  margin-bottom: 12px;
+}
+
+.carte-identite-ligne {
+  display: flex;
+  gap: 10px;
+  font-size: 0.86rem;
+  margin-bottom: 6px;
+}
+
+.carte-identite-ligne .etiquette {
+  color: var(--gris-ardoise);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  min-width: 62px;
+  text-transform: uppercase;
+  padding-top: 1px;
+}
+
+@media (max-width: 480px) {
+  .carte-identite { flex-direction: column; }
+  .carte-identite-logo { width: 100%; padding: 20px; }
+}
+
 /* ---------- Bandeaux de message (erreurs / succès clairs) ---------- */
 .bandeau {
   border-radius: var(--rayon);
@@ -382,34 +457,38 @@ footer.pied {
 }
 
 footer.pied a { color: #C8D4DE; }
-footer.pied .liens-legaux {
+
+.pied-barre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 28px;
+}
+
+.pied-copyright { color: #9FB1BF; line-height: 1.6; }
+
+.pied-liens {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 14px 0;
   color: #9FB1BF;
 }
-footer.pied .liens-legaux a { text-decoration: none; }
-footer.pied .liens-legaux a:hover { text-decoration: underline; }
+.pied-liens a { text-decoration: none; }
+.pied-liens a:hover { text-decoration: underline; }
 
-.pied-copyright { margin-top: 18px; line-height: 1.6; color: #9FB1BF; }
+.pied-tva { color: #9FB1BF; white-space: nowrap; }
+.pied-version { color: #9FB1BF; white-space: nowrap; font-size: 0.8rem; }
 
-/* Badge personnel HL — SVG, bas droite des pages PUBLIQUES uniquement */
-.logo-hl-svg {
-  position: fixed;
-  bottom: 16px;
-  right: 18px;
-  width: 54px;
-  height: 54px;
-  z-index: 40;
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.28));
-  transition: transform 0.15s ease;
-  cursor: default;
+/* Badge personnel HL — SVG, dans le pied de page des pages PUBLIQUES uniquement */
+.logo-hl-inline {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
 }
-.logo-hl-svg:hover { transform: scale(1.08); }
 
-@media (max-width: 600px) {
-  .logo-hl-svg { width: 42px; height: 42px; bottom: 12px; right: 12px; }
+@media (max-width: 700px) {
+  .pied-barre { flex-direction: column; align-items: flex-start; }
 }
 
 /* ---------- Espaces Admin / Super Admin / Membre ---------- */

@@ -26,13 +26,32 @@
 <section class="section section-alt">
   <div class="container">
     <h1>Mentions légales / RGPD / CGV</h1>
-    <p style="color:var(--texte-doux);">Cette page sera complétée avec le contenu définitif relatif à : mentions légales / rgpd / cgv.</p>
+
+    <div class="carte-identite">
+      <div class="carte-identite-logo">
+        <img src="assets/logo-mecadacty.jpg" alt="Mecadacty">
+      </div>
+      <div class="carte-identite-infos">
+        <h3 data-contenu="identite_nom">Mecadacty</h3>
+        <p class="carte-identite-societe" data-contenu="identite_societe">LES BEAUX CABOTS SRL</p>
+        <div class="carte-identite-ligne"><span class="etiquette">Tél.</span><span data-contenu="identite_tel">0032 494 05 17 96</span></div>
+        <div class="carte-identite-ligne"><span class="etiquette">Email</span><span data-contenu="identite_email">cabotsdefernelmont@gmail.com</span></div>
+        <div class="carte-identite-ligne"><span class="etiquette">Adresse</span><span data-contenu="identite_adresse">Rue Grande 26, 4219 Wasseiges (Meeffe)</span></div>
+        <div class="carte-identite-ligne"><span class="etiquette">TVA</span><span data-contenu="identite_tva">BE 0729.593.814</span></div>
+      </div>
+    </div>
+
+    <p style="color:var(--texte-doux);" data-contenu="mentions_texte">Le contenu détaillé des mentions légales, du RGPD et des conditions générales de vente sera complété ici.</p>
   </div>
 </section>
 
 <footer class="pied">
-  <div class="container">
-    <div class="liens-legaux">
+  <div class="container pied-barre">
+    <div class="pied-copyright">
+      © <span class="annee-courante"></span> <span data-contenu="identite_societe">LES BEAUX CABOTS SRL</span> — Tous droits réservés<br>
+      Contenu sous la responsabilité de Katia Renard
+    </div>
+    <div class="pied-liens">
       <a href="securisation.html">Sécurisation</a> |
       <a href="confidentialite.html">Déclaration de confidentialité</a> |
       <a href="ethique.html">Business Ethics &amp; Governance</a> |
@@ -40,31 +59,30 @@
       <a href="responsabilite.html">Limitation de responsabilité</a> |
       <a href="mentions.html">Mentions légales / RGPD / CGV</a>
     </div>
-    <div class="pied-copyright">
-      © <span class="annee-courante"></span> Hélène Laruelle — Tous droits réservés. Toute copie du site ou de son code est interdite.<br>
-      Site développé par Hélène Laruelle.<br>
-      Contenu sous la responsabilité de Katia Renard
-    </div>
+    <div class="pied-tva">TVA <span data-contenu="identite_tva">BE 0729.593.814</span></div>
+    <div class="pied-version" id="pied-version"></div>
+    <svg class="logo-hl-inline" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo personnel Helene Laruelle">
+      <defs>
+        <radialGradient id="degradeOrHL_mentions" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stop-color="#F6E27A"/>
+          <stop offset="100%" stop-color="#C9A227"/>
+        </radialGradient>
+      </defs>
+      <circle cx="28" cy="30" r="26" fill="url(#degradeOrHL_mentions)" stroke="#1F3A5F" stroke-width="1"/>
+      <text x="28" y="38" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-weight="700" font-size="22" fill="#1F3A5F" text-anchor="middle">HL</text>
+      <g transform="translate(44,4) rotate(45)">
+        <path d="M0 10 L3 0 L6 10 Z" fill="#1F3A5F"/>
+        <path d="M0 10 L-2 14 L0 12 Z" fill="#C9A227"/>
+        <path d="M6 10 L8 14 L6 12 Z" fill="#C9A227"/>
+        <circle cx="3" cy="6" r="1.1" fill="#F6E27A"/>
+      </g>
+    </svg>
   </div>
 </footer>
 
-<svg class="logo-hl-svg" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo personnel Helene Laruelle">
-  <defs>
-    <radialGradient id="degradeOr_mentions" cx="35%" cy="30%" r="75%">
-      <stop offset="0%" stop-color="#F6E27A"/>
-      <stop offset="100%" stop-color="#C9A227"/>
-    </radialGradient>
-  </defs>
-  <circle cx="28" cy="30" r="26" fill="url(#degradeOr_mentions)" stroke="#1F3A5F" stroke-width="1"/>
-  <text x="28" y="38" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-weight="700" font-size="22" fill="#1F3A5F" text-anchor="middle">HL</text>
-  <g transform="translate(44,4) rotate(45)">
-    <path d="M0 10 L3 0 L6 10 Z" fill="#1F3A5F"/>
-    <path d="M0 10 L-2 14 L0 12 Z" fill="#C9A227"/>
-    <path d="M6 10 L8 14 L6 12 Z" fill="#C9A227"/>
-    <circle cx="3" cy="6" r="1.1" fill="#F6E27A"/>
-  </g>
-</svg>
 
+<script type="module" src="firebase-config.js"></script>
+<script type="module" src="contenu.js"></script>
 <script type="module" src="interface.js"></script>
 </body>
 </html>

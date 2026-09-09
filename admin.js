@@ -365,7 +365,7 @@ function marquerMessagesLus() {
 
 // ---------- Contenu du site ----------
 const clesContenu = [
-  ["slogan_site", "En-tête — Slogan sous le logo"],
+  ["slogan_site", "Slogan (en-tête des pages, au-dessus du titre sur l'accueil)"],
   ["accueil_titre", "Accueil — Titre principal"],
   ["accueil_chapo", "Accueil — Texte sous le titre"],
   ["accueil_services_titre", "Accueil — Titre section services"],
@@ -384,6 +384,13 @@ const clesContenu = [
   ["contact_gsm", "Contact — Ligne téléphone"],
   ["contact_email", "Contact — Ligne e-mail"],
   ["contact_adresse", "Contact — Ligne adresse"],
+  ["identite_nom", "Mentions légales — Nom affiché (carte d'identité)"],
+  ["identite_societe", "Mentions légales — Société"],
+  ["identite_tel", "Mentions légales — Téléphone"],
+  ["identite_email", "Mentions légales — E-mail"],
+  ["identite_adresse", "Mentions légales — Adresse"],
+  ["identite_tva", "Mentions légales — Numéro de TVA"],
+  ["mentions_texte", "Mentions légales — Texte principal"],
 ];
 
 async function chargerContenuAdmin() {

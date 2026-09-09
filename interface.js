@@ -2,7 +2,13 @@
 // MECADACTY — Comportements d'interface communs
 // ============================================================
 
+import { VERSION_SITE } from "./version.js";
+
 document.addEventListener("DOMContentLoaded", () => {
+  // Numéro de version dans le pied de page public
+  const versionEl = document.getElementById("pied-version");
+  if (versionEl) versionEl.textContent = "Version " + VERSION_SITE;
+
   // Menu mobile
   const toggle = document.querySelector(".menu-mobile-toggle");
   const nav = document.querySelector("nav.entete-nav");
