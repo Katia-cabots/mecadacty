@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace Admin — Mecadacty</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-entete">
+  <div class="app-entete-gauche">
+    <a href="index.html" class="icone-maison" title="Accueil du site">🏠</a>
+    <div class="app-entete-titre-bloc">
+      <div class="titre-site">Mecadacty</div>
+      <span class="badge-role" id="badge-role">Admin</span>
+      <span class="version-tag" id="version-tag"></span>
+    </div>
+  </div>
+  <button class="bouton-deconnexion" id="btn-deconnexion">Se déconnecter</button>
+</header>
+
+<div class="app-layout">
+  <nav class="app-menu">
+    <button data-onglet="tableau" class="actif">Tableau de bord</button>
+    <button data-onglet="clients">Membres <span class="point-notif" id="notif-clients" style="display:none;"></span></button>
+    <button data-onglet="dossiers">Dossiers</button>
+    <button data-onglet="rdv">Rendez-vous</button>
+    <button data-onglet="inscriptions">Demandes d'inscription <span class="point-notif" id="notif-inscriptions" style="display:none;"></span></button>
+    <button data-onglet="messages">Messages <span class="point-notif" id="notif-messages" style="display:none;"></span></button>
+    <button data-onglet="contenu">Contenu du site</button>
+    <button data-onglet="motsdepasse" id="onglet-btn-motsdepasse" style="display:none;">Mots de passe</button>
+  </nav>
+
+  <main class="app-contenu">
+
+    <section class="app-onglet actif" id="onglet-tableau">
+      <h2>Tableau de bord</h2>
+      <div id="tableau-bandeau" class="bandeau"></div>
+      <div class="carte" id="resume-tableau">
+        <p class="message-vide">Chargement...</p>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-clients">
+      <div class="entete-onglet">
+        <h2 style="margin:0;">Membres</h2>
+        <button id="btn-toggle-form-client" class="bouton-mini">+ Ajouter un membre</button>
+      </div>
+
+      <div class="carte" id="carte-form-client" style="display:none;">
+        <h3>Nouveau membre</h3>
+        <div class="champ">
+          <label>Nom</label>
+          <input type="text" id="cl-nom">
+        </div>
+        <div class="champ">
+          <label>Prénom</label>
+          <input type="text" id="cl-prenom">
+        </div>
+        <div class="champ">
+          <label>Date de naissance (pour suggestion du mot de passe)</label>
+          <input type="date" id="cl-naissance">
+        </div>
+        <div class="champ">
+          <label>GSM</label>
+          <input type="tel" id="cl-gsm">
+        </div>
+        <div class="champ">
+          <label>E-mail (laisser vide pour une génération automatique)</label>
+          <input type="email" id="cl-email">
+        </div>
+        <div class="champ">
+          <label>Identifiant (suggéré, modifiable)</label>
+          <input type="text" id="cl-identifiant" class="sans-caracteres-speciaux">
+        </div>
+        <div class="champ">
+          <label>Mot de passe (suggéré, modifiable)</label>
+          <div class="champ-mdp-wrap">
+            <input type="password" id="cl-motdepasse" class="sans-caracteres-speciaux">
+            <button type="button" class="oeil-toggle">👁</button>
+          </div>
+          <p class="champ-aide">Lettres, chiffres, points et tirets uniquement — pas de caractères spéciaux.</p>
+        </div>
+        <button id="btn-suggerer" class="bouton-secondaire" style="border:1.5px solid var(--bleu-profond); color:var(--bleu-profond); cursor:pointer;">Suggérer identifiant / mot de passe</button>
+        <button id="btn-ajouter-client" class="bouton-primaire" style="border:none; cursor:pointer; margin-left:8px;">Enregistrer le membre</button>
+        <div id="clients-bandeau" class="bandeau"></div>
+      </div>
+
+      <div class="carte">
+        <h3>Liste des membres</h3>
+        <table class="tableau-donnees" id="table-clients">
+          <thead><tr><th>Nom</th><th>Contact</th><th>Identifiant</th><th>Dernière connexion</th></tr></thead>
+          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-dossiers">
+      <h2>Dossiers / missions</h2>
+      <div class="carte">
+        <h3>Nouveau dossier</h3>
+        <div class="champ">
+          <label>Membre</label>
+          <select id="do-client"><option value="">— Choisir —</option></select>
+        </div>
+        <div class="champ">
+          <label>Type</label>
+          <select id="do-type">
+            <option value="ponctuel">Mission ponctuelle</option>
+            <option value="recurrent">Mission récurrente</option>
+          </select>
+        </div>
+        <div class="champ">
+          <label>Description</label>
+          <textarea id="do-description" rows="3"></textarea>
+        </div>
+        <div class="champ">
+          <label>Statut</label>
+          <select id="do-statut">
+            <option value="attente">En attente</option>
+            <option value="en_cours">En cours</option>
+            <option value="termine">Terminé</option>
+          </select>
+        </div>
+        <button id="btn-ajouter-dossier" class="bouton-primaire" style="border:none; cursor:pointer;">Créer le dossier</button>
+        <div id="dossiers-bandeau" class="bandeau"></div>
+      </div>
+      <div class="carte">
+        <h3>Tous les dossiers</h3>
+        <table class="tableau-donnees" id="table-dossiers">
+          <thead><tr><th>Membre</th><th>Type</th><th>Description</th><th>Statut</th></tr></thead>
+          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-rdv">
+      <h2>Rendez-vous</h2>
+      <div class="carte">
+        <h3>Nouveau rendez-vous</h3>
+        <div class="champ">
+          <label>Membre</label>
+          <select id="rd-client"><option value="">— Choisir —</option></select>
+        </div>
+        <div class="champ">
+          <label>Date &amp; heure</label>
+          <input type="datetime-local" id="rd-date">
+        </div>
+        <div class="champ">
+          <label>Objet</label>
+          <input type="text" id="rd-objet">
+        </div>
+        <button id="btn-ajouter-rdv" class="bouton-primaire" style="border:none; cursor:pointer;">Créer le rendez-vous</button>
+        <div id="rdv-bandeau" class="bandeau"></div>
+      </div>
+      <div class="carte">
+        <h3>Tous les rendez-vous</h3>
+        <table class="tableau-donnees" id="table-rdv">
+          <thead><tr><th>Membre</th><th>Date</th><th>Objet</th><th>Confirmé</th></tr></thead>
+          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-inscriptions">
+      <h2>Demandes d'inscription</h2>
+      <div class="carte">
+        <table class="tableau-donnees" id="table-inscriptions">
+          <thead><tr><th>Nom</th><th>Contact</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-messages">
+      <h2>Messages reçus</h2>
+      <div class="carte">
+        <table class="tableau-donnees" id="table-messages">
+          <thead><tr><th>Nom</th><th>Contact</th><th>Message</th><th>Date</th></tr></thead>
+          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-contenu">
+      <h2>Contenu du site</h2>
+      <p style="color:var(--texte-doux); font-size:0.9rem;">Modifiez ici les textes affichés sur les pages publiques du site. Laissez un champ vide pour garder le texte par défaut.</p>
+      <div class="carte" id="liste-contenu">
+        <p class="message-vide">Chargement...</p>
+      </div>
+      <button id="btn-enregistrer-contenu" class="bouton-primaire" style="border:none; cursor:pointer;">Enregistrer le contenu</button>
+      <div id="contenu-bandeau" class="bandeau"></div>
+    </section>
+
+    <section class="app-onglet" id="onglet-motsdepasse">
+      <h2>Mots de passe <span style="font-size:0.75rem; color:var(--texte-doux); font-weight:400;">(visible uniquement sur ce compte)</span></h2>
+      <div class="carte">
+        <table class="tableau-donnees" id="table-motsdepasse">
+          <thead><tr><th>Nom</th><th>Identifiant</th><th>Mot de passe</th><th>Rôle</th><th>Dernière connexion</th><th>Réinitialiser</th></tr></thead>
+          <tbody><tr><td colspan="6" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script type="module" src="admin.js"></script>
+<script type="module" src="interface.js"></script>
+</body>
+</html>

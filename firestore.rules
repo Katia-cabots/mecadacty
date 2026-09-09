@@ -1,0 +1,47 @@
+// ============================================================
+// Projet Firebase : mecadacty
+// Référence projet : Mecadacty — site internet
+// Version du site : V01-006
+// ============================================================
+// NOTE IMPORTANTE : ces règles sont un point de départ simple.
+// L'authentification "maison" (identifiant/mot de passe stockés
+// dans Firestore, comparés côté client) ne permet pas à Firestore
+// de savoir QUI écrit réellement. Tant que Firebase Authentication
+// n'est pas branché, ces règles ouvrent large (comme pour le site
+// des Cabots de Fernelmont à ses débuts) : c'est un choix delibéré
+// pour rester 100% gratuit et simple à ce stade, à resserrer plus
+// tard si des données sensibles venaient à être stockées.
+// ============================================================
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Collection "utilisateurs" : Super Admin, Admin, Membres (clients)
+    match /utilisateurs/{userId} {
+      allow read, write: if true;
+    }
+
+    match /dossiers/{dossierId} {
+      allow read, write: if true;
+    }
+
+    match /rdv/{rdvId} {
+      allow read, write: if true;
+    }
+
+    match /demandesInscription/{demandeId} {
+      allow read, write: if true;
+    }
+
+    match /messagesContact/{messageId} {
+      allow read, write: if true;
+    }
+
+    match /contenu/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

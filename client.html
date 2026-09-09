@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon espace — Mecadacty</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-entete">
+  <div class="app-entete-gauche">
+    <a href="index.html" class="icone-maison" title="Accueil du site">🏠</a>
+    <div class="app-entete-titre-bloc">
+      <div class="titre-site">Mecadacty</div>
+      <span class="badge-role role-membre">Membre</span>
+      <span class="version-tag" id="version-tag"></span>
+    </div>
+  </div>
+  <button class="bouton-deconnexion" id="btn-deconnexion">Se déconnecter</button>
+</header>
+
+<div class="app-layout">
+  <nav class="app-menu">
+    <button data-onglet="accueil" class="actif">Mon espace</button>
+    <button data-onglet="dossiers">Mes dossiers</button>
+    <button data-onglet="rdv">Mes rendez-vous</button>
+  </nav>
+
+  <main class="app-contenu">
+
+    <section class="app-onglet actif" id="onglet-accueil">
+      <h2 id="salutation-client">Bienvenue</h2>
+      <div class="carte">
+        <p>Retrouvez ici le suivi de vos dossiers et vos rendez-vous avec Mecadacty.</p>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-dossiers">
+      <h2>Mes dossiers</h2>
+      <div class="carte">
+        <table class="tableau-donnees" id="table-mes-dossiers">
+          <thead><tr><th>Type</th><th>Description</th><th>Statut</th></tr></thead>
+          <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-rdv">
+      <h2>Mes rendez-vous</h2>
+      <div class="carte">
+        <h3>Demander un rendez-vous</h3>
+        <div class="champ">
+          <label>Date souhaitée</label>
+          <input type="datetime-local" id="rd-date-client">
+        </div>
+        <div class="champ">
+          <label>Objet</label>
+          <input type="text" id="rd-objet-client">
+        </div>
+        <button id="btn-demander-rdv" class="bouton-primaire" style="border:none; cursor:pointer;">Envoyer la demande</button>
+        <div id="rdv-client-bandeau" class="bandeau"></div>
+      </div>
+      <div class="carte">
+        <h3>Historique</h3>
+        <table class="tableau-donnees" id="table-mes-rdv">
+          <thead><tr><th>Date</th><th>Objet</th><th>Statut</th></tr></thead>
+          <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script type="module" src="client.js"></script>
+<script type="module" src="interface.js"></script>
+</body>
+</html>
