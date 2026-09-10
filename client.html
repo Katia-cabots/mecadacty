@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mon espace — MécaDacty</title>
+<title>Mon espace — MecaDacty</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <div class="app-entete-gauche">
     <a href="index.html" class="icone-maison" title="Accueil du site"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg></a>
     <div class="app-entete-titre-bloc">
-      <div class="titre-site">MécaDacty</div>
+      <div class="titre-site">MecaDacty</div>
       <div class="salutation-entete" id="salutation-entete">Bonjour</div>
       <span class="badge-role role-client">Client</span>
       <span class="version-tag" id="version-tag"></span>
@@ -28,6 +28,7 @@
     <button data-onglet="heures">Mes heures</button>
     <button data-onglet="rdv">Mes rendez-vous</button>
     <button data-onglet="messagerie">Message à Katia <span class="point-notif" id="notif-messagerie-client" style="display:none;"></span></button>
+    <button data-onglet="avis">Laisser un avis</button>
   </nav>
 
   <main class="app-contenu">
@@ -35,7 +36,7 @@
     <section class="app-onglet actif" id="onglet-accueil">
       <h2 id="salutation-client">Bienvenue</h2>
       <div class="carte">
-        <p>Retrouvez ici le suivi de vos dossiers et vos rendez-vous avec MécaDacty.</p>
+        <p>Retrouvez ici le suivi de vos dossiers et vos rendez-vous avec MecaDacty.</p>
       </div>
     </section>
 
@@ -104,6 +105,36 @@
           <button id="btn-envoyer-message-client" class="bouton-primaire" style="border:none; cursor:pointer;">Envoyer</button>
         </div>
         <div id="messagerie-client-bandeau" class="bandeau"></div>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-avis">
+      <h2>Laisser un avis</h2>
+      <div class="carte">
+        <p style="color:var(--texte-doux); font-size:0.9rem;">Votre avis sera visible sur la page "Ils parlent de nous" après validation par Katia.</p>
+        <div class="champ">
+          <label>Note</label>
+          <select id="av-note">
+            <option value="5">★★★★★ (5/5)</option>
+            <option value="4">★★★★☆ (4/5)</option>
+            <option value="3">★★★☆☆ (3/5)</option>
+            <option value="2">★★☆☆☆ (2/5)</option>
+            <option value="1">★☆☆☆☆ (1/5)</option>
+          </select>
+        </div>
+        <div class="champ">
+          <label>Votre avis</label>
+          <textarea id="av-texte" rows="4"></textarea>
+        </div>
+        <button id="btn-envoyer-avis" class="bouton-primaire" style="border:none; cursor:pointer;">Envoyer mon avis</button>
+        <div id="avis-client-bandeau" class="bandeau"></div>
+      </div>
+      <div class="carte">
+        <h3>Mes avis</h3>
+        <table class="tableau-donnees" id="table-mes-avis">
+          <thead><tr><th>Note</th><th>Avis</th><th>Statut</th></tr></thead>
+          <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
       </div>
     </section>
 

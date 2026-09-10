@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Actualités &amp; conseils — MecaDacty</title>
-<meta name="description" content="Articles et conseils administratifs de MecaDacty, gérée par Katia Renard à Wasseiges.">
+<title>Ils parlent de nous — MecaDacty</title>
+<meta name="description" content="Avis et témoignages des clients de MecaDacty, gérée par Katia Renard à Wasseiges.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,8 +22,8 @@
     <nav class="entete-nav">
       <a href="index.html">Accueil</a>
       <a href="services.html">Services</a>
-      <a href="actualites.html" class="actif">Actualités</a>
-      <a href="avis.html">Ils parlent de nous</a>
+      <a href="actualites.html">Actualités</a>
+      <a href="avis.html" class="actif">Ils parlent de nous</a>
       <a href="apropos.html">À propos</a>
       <a href="contact.html">Contact</a>
       <a href="connexion.html" class="bouton-connexion">Espace client</a>
@@ -33,14 +33,14 @@
 
 <section class="heros" style="padding:56px 24px;">
   <div class="container">
-    <h1 data-contenu="actualites_titre">Actualités &amp; conseils</h1>
-    <p class="chapo" data-contenu="actualites_chapo">Quelques repères et conseils pratiques pour la gestion administrative de votre activité.</p>
+    <h1 data-contenu="avis_titre">Ils parlent de nous</h1>
+    <p class="chapo" data-contenu="avis_chapo">Les avis de clients qui ont fait appel à MecaDacty.</p>
   </div>
 </section>
 
 <section class="section section-alt">
   <div class="container">
-    <div class="liste-articles" id="liste-articles">
+    <div class="grille-temoignages" id="liste-avis">
       <p class="message-vide">Chargement...</p>
     </div>
   </div>
@@ -70,30 +70,32 @@
   import { db } from "./firebase-config.js";
   import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  async function chargerArticles() {
-    const conteneur = document.getElementById("liste-articles");
+  async function chargerAvis() {
+    const conteneur = document.getElementById("liste-avis");
     try {
-      const q = query(collection(db, "articles"), where("visible", "==", true));
+      const q = query(collection(db, "avis"), where("valide", "==", true));
       const snap = await getDocs(q);
       if (snap.empty) {
-        conteneur.innerHTML = `<p class="message-vide">Aucun article publié pour le moment.</p>`;
+        conteneur.innerHTML = `<p class="message-vide">Les premiers avis arrivent bientôt.</p>`;
         return;
       }
-      const articles = snap.docs.map(d => d.data()).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-      conteneur.innerHTML = articles.map(a => `
-        <div class="carte-article">
-          <div class="date-article">${a.date || ""}</div>
-          <h3>${a.titre}</h3>
-          <div class="contenu-article">${a.contenu}</div>
-        </div>
-      `).join("");
+      conteneur.innerHTML = snap.docs.map(d => {
+        const a = d.data();
+        const etoiles = "★".repeat(a.note || 0) + "☆".repeat(5 - (a.note || 0));
+        return `
+        <div class="carte-temoignage">
+          <span class="guillemet">"</span>
+          <p class="citation">${a.texte}</p>
+          <p class="auteur">${a.clientNom || "Client MecaDacty"} — <span style="color:var(--rose);">${etoiles}</span></p>
+        </div>`;
+      }).join("");
     } catch (err) {
       console.error(err);
-      conteneur.innerHTML = `<p class="message-vide">Impossible de charger les articles pour le moment.</p>`;
+      conteneur.innerHTML = `<p class="message-vide">Impossible de charger les avis pour le moment.</p>`;
     }
   }
 
-  chargerArticles();
+  chargerAvis();
 </script>
 </body>
 </html>

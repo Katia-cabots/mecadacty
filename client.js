@@ -249,9 +249,59 @@ async function chargerMesHeures() {
   }
 }
 
+// ---------- Mes avis (soumission + statut de validation) ----------
+async function chargerMesAvis() {
+  const corps = document.querySelector("#table-mes-avis tbody");
+  if (!utilisateur) return;
+  try {
+    const q = query(collection(db, "avis"), where("clientId", "==", utilisateur.id));
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      corps.innerHTML = `<tr><td colspan="3" class="message-vide">Aucun avis envoyé pour le moment.</td></tr>`;
+      return;
+    }
+    corps.innerHTML = snap.docs.map(d => {
+      const data = d.data();
+      const etoiles = "★".repeat(data.note || 0) + "☆".repeat(5 - (data.note || 0));
+      return `<tr>
+        <td>${etoiles}</td>
+        <td>${data.texte}</td>
+        <td><span class="statut-pastille ${data.valide ? "statut-termine" : "statut-attente"}">${data.valide ? "Publié" : "En attente de validation"}</span></td>
+      </tr>`;
+    }).join("");
+  } catch (err) {
+    console.error(err);
+    corps.innerHTML = `<tr><td colspan="3" class="message-vide">Erreur de chargement de vos avis.</td></tr>`;
+  }
+}
+
+document.getElementById("btn-envoyer-avis").addEventListener("click", async () => {
+  const texte = document.getElementById("av-texte").value.trim();
+  const note = parseInt(document.getElementById("av-note").value, 10);
+  if (!texte || !utilisateur) {
+    afficherBandeau("avis-client-bandeau", "Merci d'écrire votre avis avant d'envoyer.", "erreur");
+    return;
+  }
+  try {
+    await addDoc(collection(db, "avis"), {
+      clientId: utilisateur.id,
+      clientNom: `${utilisateur.prenom} ${utilisateur.nom}`,
+      texte, note, valide: false,
+      dateCreation: serverTimestamp()
+    });
+    afficherBandeau("avis-client-bandeau", "Merci ! Votre avis sera visible après validation.", "succes");
+    document.getElementById("av-texte").value = "";
+    chargerMesAvis();
+  } catch (err) {
+    console.error(err);
+    afficherBandeau("avis-client-bandeau", "Erreur lors de l'envoi de l'avis.", "erreur");
+  }
+});
+
 // ---------- Chargement initial ----------
 chargerMesDossiers();
 chargerMesHeures();
 chargerMesRdv();
 chargerFilMessagesClient();
 verifierNotifMessagerieClient();
+chargerMesAvis();

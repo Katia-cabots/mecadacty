@@ -1,7 +1,7 @@
 // ============================================================
 // Projet Firebase : mecadacty-51f6f
 // Référence projet : Mecadacty — site internet
-// Version du site : V01-024
+// Version du site : V01-027
 // Authentification : Firebase Authentication (Email/Mot de passe)
 // ============================================================
 // Ces règles vérifient réellement l'identité de la personne
@@ -97,6 +97,12 @@ service cloud.firestore {
     match /services/{serviceId} {
       allow read: if resource.data.visible == true || estAdmin();
       allow write: if estAdmin();
+    }
+
+    match /avis/{avisId} {
+      allow read: if resource.data.valide == true || estAdmin() || estProprietaire(resource.data.clientId);
+      allow create: if estAdmin() || estProprietaire(request.resource.data.clientId);
+      allow update, delete: if estAdmin();
     }
   }
 }

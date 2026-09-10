@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Espace Admin — MécaDacty</title>
+<title>Espace Admin — MecaDacty</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <div class="app-entete-gauche">
     <a href="index.html" class="icone-maison" title="Accueil du site"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg></a>
     <div class="app-entete-titre-bloc">
-      <div class="titre-site">MécaDacty</div>
+      <div class="titre-site">MecaDacty</div>
       <div class="salutation-entete" id="salutation-entete">Bonjour</div>
       <span class="badge-role" id="badge-role">Admin</span>
       <span class="version-tag" id="version-tag"></span>
@@ -32,6 +32,7 @@
     <button data-onglet="inscriptions">Demandes d'inscription <span class="point-notif" id="notif-inscriptions" style="display:none;"></span></button>
     <button data-onglet="messages">Formulaire de contact <span class="point-notif" id="notif-messages" style="display:none;"></span></button>
     <button data-onglet="messagerie">Messagerie clients <span class="point-notif" id="notif-messagerie" style="display:none;"></span></button>
+    <button data-onglet="avis">Avis clients <span class="point-notif" id="notif-avis" style="display:none;"></span></button>
     <button data-onglet="contenu">Contenu du site</button>
     <button data-onglet="articles">Actualités</button>
     <button data-onglet="motsdepasse" id="onglet-btn-motsdepasse" style="display:none;">Mots de passe</button>
@@ -262,6 +263,17 @@
           <button id="btn-envoyer-message" class="bouton-primaire" style="border:none; cursor:pointer;">Envoyer</button>
         </div>
         <div id="messagerie-bandeau" class="bandeau"></div>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-avis">
+      <h2>Avis clients</h2>
+      <p style="color:var(--texte-doux); font-size:0.9rem;">Valide un avis pour qu'il apparaisse sur la page publique "Ils parlent de nous".</p>
+      <div class="carte">
+        <table class="tableau-donnees" id="table-avis">
+          <thead><tr><th>Client</th><th>Note</th><th>Avis</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
       </div>
     </section>
 

@@ -39,7 +39,7 @@ function appliquerAffichageRole() {
     document.getElementById("onglet-btn-motsdepasse").style.display = "block";
   } else {
     // Easter egg discret pour Katia uniquement (comme sur le site des Cabots de Fernelmont)
-    badge.textContent = "Admin 🍓";
+    badge.innerHTML = `Admin <svg width="12" height="12" viewBox="0 0 24 24" style="vertical-align:-1px;"><path fill="#000000" d="M12 8c-1-2-3-3-5-2 1-1 3-1 4 0-2-2-5-2-6 0 3-1 5 0 6 2h1c1-2 3-3 4-2-1-1-3-1-4 0 2-2 5-2 6 0-3-1-5 0-6 2z"/><path fill="#000000" d="M12 9c-4.5 0-8 3-8 6.5S8.5 22 12 22s8-2.9 8-6.5S16.5 9 12 9z"/></svg>`;
   }
 
   const salutation = document.getElementById("salutation-admin");
@@ -649,6 +649,8 @@ const clesContenu = [
   ["temoignage3_auteur", "Témoignage 3 — Auteur"],
   ["actualites_titre", "Actualités — Titre"],
   ["actualites_chapo", "Actualités — Texte d'introduction"],
+  ["avis_titre", "Avis — Titre"],
+  ["avis_chapo", "Avis — Texte d'introduction"],
 ];
 
 async function chargerContenuAdmin() {
@@ -863,6 +865,55 @@ document.getElementById("btn-reinit-contenu").addEventListener("click", async ()
   }
 });
 
+// ---------- Avis clients (validation) ----------
+async function chargerAvisAdmin() {
+  const corps = document.querySelector("#table-avis tbody");
+  try {
+    const snap = await getDocs(collection(db, "avis"));
+    const enAttente = snap.docs.filter(d => !d.data().valide).length;
+    if (enAttente > 0) document.getElementById("notif-avis").style.display = "inline-block";
+
+    if (snap.empty) {
+      corps.innerHTML = `<tr><td colspan="5" class="message-vide">Aucun avis pour le moment.</td></tr>`;
+      return;
+    }
+    const avisListe = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.valide === b.valide) ? 0 : (a.valide ? 1 : -1));
+    corps.innerHTML = avisListe.map(a => {
+      const etoiles = "★".repeat(a.note || 0) + "☆".repeat(5 - (a.note || 0));
+      return `<tr>
+        <td>${a.clientNom || "—"}</td>
+        <td>${etoiles}</td>
+        <td>${a.texte}</td>
+        <td><span class="statut-pastille ${a.valide ? "statut-termine" : "statut-attente"}">${a.valide ? "Publié" : "En attente"}</span></td>
+        <td>
+          <button class="bouton-mini-discret btn-valider-avis" data-id="${a.id}" data-valide="${a.valide}">${a.valide ? "Dépublier" : "Valider"}</button>
+          <button class="bouton-mini-discret btn-suppr-avis" data-id="${a.id}">Supprimer</button>
+        </td>
+      </tr>`;
+    }).join("");
+
+    document.querySelectorAll(".btn-valider-avis").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await updateDoc(doc(db, "avis", bouton.dataset.id), { valide: bouton.dataset.valide !== "true" });
+          chargerAvisAdmin();
+        } catch (err) { console.error(err); }
+      });
+    });
+    document.querySelectorAll(".btn-suppr-avis").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "avis", bouton.dataset.id));
+          chargerAvisAdmin();
+        } catch (err) { console.error(err); }
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    corps.innerHTML = `<tr><td colspan="5" class="message-vide">Erreur de chargement des avis.</td></tr>`;
+  }
+}
+
 // ---------- Comptes (Super Admin uniquement) ----------
 // Le mot de passe stocké ici est une copie de confort pour le Super Admin
 // (risque connu et accepté) — il reflète le mot de passe donné à la création
@@ -923,6 +974,7 @@ async function chargerMotsDePasse() {
     chargerContenuAdmin(),
     chargerArticles(),
     chargerServicesAdmin(),
-    verifierNotifMessagerie()
+    verifierNotifMessagerie(),
+    chargerAvisAdmin()
   ]);
 })();

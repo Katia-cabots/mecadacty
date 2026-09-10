@@ -7,15 +7,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --bleu-profond: #14456E;
-  --bleu-moyen: #247CC3;
+  --bleu-profond: #14304F;
+  --bleu-moyen: #1A4FB4;
   --gris-ardoise: #5B6B79;
   --gris-clair: #E7EBEE;
   --fond: #F5F7F9;
   --blanc: #FFFFFF;
   --texte: #1D2530;
   --texte-doux: #56626E;
-  --rose: #C93A8C;
+  --or: #C9A227;
+  --vert: #55B14E;
   --succes: #4FA84A;
   --alerte: #B5484D;
 
@@ -101,6 +102,15 @@ a { color: var(--bleu-moyen); }
   .entete-marque img.logo-site-accueil { height: 48px; }
 }
 
+.logo-complet-accueil {
+  height: 92px;
+  width: auto;
+}
+
+@media (max-width: 560px) {
+  .logo-complet-accueil { height: 66px; }
+}
+
 .logo-icone-texte {
   display: flex;
   align-items: center;
@@ -134,7 +144,7 @@ a { color: var(--bleu-moyen); }
   font-size: 0.9rem;
   line-height: 1.35;
   color: var(--texte-doux);
-  border-left: 2px solid var(--rose);
+  border-left: 2px solid var(--or);
   padding-left: 12px;
   max-width: 170px;
 }
@@ -175,7 +185,7 @@ nav.entete-nav a {
 
 nav.entete-nav a:hover,
 nav.entete-nav a.actif {
-  border-bottom-color: var(--rose);
+  border-bottom-color: var(--or);
   color: var(--bleu-profond);
 }
 
@@ -254,10 +264,10 @@ nav.entete-nav a.actif {
 }
 
 .bouton-primaire {
-  background: var(--rose);
-  color: var(--blanc);
+  background: var(--or);
+  color: var(--bleu-profond);
 }
-.bouton-primaire:hover { background: #A82E73; }
+.bouton-primaire:hover { background: #DDB93A; }
 
 .bouton-secondaire {
   background: transparent;
@@ -287,7 +297,7 @@ nav.entete-nav a.actif {
 .carte-service {
   background: var(--blanc);
   border: 1px solid var(--gris-clair);
-  border-left: 3px solid var(--rose);
+  border-left: 3px solid var(--or);
   border-radius: var(--rayon);
   padding: 22px;
 }
@@ -389,6 +399,8 @@ nav.entete-nav a.actif {
 .bloc-presentation .presentation-texte { flex: 1; min-width: 260px; }
 
 .bloc-presentation img.portrait.logo-presentation {
+  width: 260px;
+  height: 180px;
   border-radius: var(--rayon);
   object-fit: contain;
   background: var(--blanc);
@@ -398,11 +410,11 @@ nav.entete-nav a.actif {
 .liste-atouts {
   list-style: none;
   padding: 0;
-  margin: 18px auto 0 auto;
+  margin: 18px 0 0 0;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  max-width: 460px;
+  width: 100%;
   justify-items: center;
 }
 
@@ -420,7 +432,7 @@ nav.entete-nav a.actif {
 
 @media (max-width: 560px) {
   .bloc-presentation { flex-direction: column; align-items: center; text-align: center; }
-  .liste-atouts { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 320px; }
+  .liste-atouts { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
 }
 
 /* ---------- Témoignages ---------- */
@@ -442,7 +454,7 @@ nav.entete-nav a.actif {
 .carte-temoignage .guillemet {
   font-family: var(--serif);
   font-size: 2.4rem;
-  color: var(--rose);
+  color: var(--or);
   line-height: 1;
   display: block;
   margin-bottom: 4px;
@@ -510,7 +522,7 @@ nav.entete-nav a.actif {
   height: 88px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--rose);
+  border: 2px solid var(--or);
   background: var(--blanc);
 }
 
@@ -523,7 +535,7 @@ nav.entete-nav a.actif {
 .carte-identite-infos h3 { margin-bottom: 2px; font-size: 1.1rem; }
 
 .carte-identite-societe {
-  color: var(--rose);
+  color: var(--or);
   font-weight: 700;
   font-size: 0.78rem;
   letter-spacing: 0.03em;
@@ -606,7 +618,7 @@ footer.pied a { color: #C8D4DE; }
   border-radius: 50%;
   object-fit: cover;
   background: var(--blanc);
-  border: 2px solid var(--rose);
+  border: 2px solid var(--or);
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
@@ -722,8 +734,8 @@ footer.pied a { color: #C8D4DE; }
   display: inline-block;
   margin-top: 3px;
   font-size: 0.7rem;
-  background: var(--rose);
-  color: var(--blanc);
+  background: var(--or);
+  color: var(--bleu-profond);
   padding: 2px 8px;
   border-radius: 10px;
   font-weight: 700;
@@ -777,7 +789,7 @@ footer.pied a { color: #C8D4DE; }
 .app-menu button:hover, .app-menu a:hover,
 .app-menu button.actif, .app-menu a.actif {
   background: var(--fond);
-  border-left-color: var(--rose);
+  border-left-color: var(--or);
   color: var(--bleu-profond);
   font-weight: 600;
 }
@@ -872,5 +884,5 @@ table.tableau-donnees th { color: var(--gris-ardoise); font-weight: 600; font-si
   .app-layout { flex-direction: column; }
   .app-menu { width: 100%; display: flex; overflow-x: auto; padding: 8px; }
   .app-menu button, .app-menu a { width: auto; white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
-  .app-menu button.actif, .app-menu a.actif, .app-menu button:hover, .app-menu a:hover { border-left: none; border-bottom-color: var(--rose); }
+  .app-menu button.actif, .app-menu a.actif, .app-menu button:hover, .app-menu a:hover { border-left: none; border-bottom-color: var(--or); }
 }
