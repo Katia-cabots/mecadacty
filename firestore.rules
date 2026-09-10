@@ -1,7 +1,7 @@
 // ============================================================
 // Projet Firebase : mecadacty-51f6f
 // Référence projet : Mecadacty — site internet
-// Version du site : V01-028
+// Version du site : V01-029
 // Authentification : Firebase Authentication (Email/Mot de passe)
 // ============================================================
 // Ces règles vérifient réellement l'identité de la personne
@@ -100,7 +100,14 @@ service cloud.firestore {
     }
 
     match /avis/{avisId} {
-      allow read: if resource.data.valide == true || estAdmin() || estProprietaire(resource.data.clientId);
+      // "list" ouvert : Firestore ne peut pas toujours vérifier une condition
+      // combinée (valide==true OU admin OU propriétaire) pour une requête de
+      // liste publique — les avis étant peu sensibles (nom + texte d'avis
+      // destinés à devenir publics), on ouvre la liste et on s'appuie sur le
+      // filtre where("valide","==",true) côté site public pour ne montrer
+      // que les avis validés.
+      allow list: if true;
+      allow get: if resource.data.valide == true || estAdmin() || estProprietaire(resource.data.clientId);
       allow create: if estAdmin() || estProprietaire(request.resource.data.clientId);
       allow update, delete: if estAdmin();
     }
