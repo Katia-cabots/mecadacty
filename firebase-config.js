@@ -1,12 +1,14 @@
 // ============================================================
 // MECADACTY — Configuration Firebase
 // Projet réel : mecadacty-51f6f
+// Authentification : Firebase Authentication (Email/Mot de passe)
 // ============================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyCe8JucgufbT8dGtX8I4BlVtLV_JT2kvBA",
   authDomain: "mecadacty-51f6f.firebaseapp.com",
   projectId: "mecadacty-51f6f",
@@ -17,3 +19,4 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export const auth = getAuth(app);

@@ -278,12 +278,14 @@
     </section>
 
     <section class="app-onglet" id="onglet-motsdepasse">
-      <h2>Mots de passe <span style="font-size:0.75rem; color:var(--texte-doux); font-weight:400;">(visible uniquement sur ce compte)</span></h2>
+      <h2>Comptes <span style="font-size:0.75rem; color:var(--texte-doux); font-weight:400;">(visible uniquement sur ce compte)</span></h2>
+      <p style="color:var(--texte-doux); font-size:0.88rem;">Le mot de passe affiché est une copie de confort connue à la création du compte — elle ne se met pas à jour toute seule si la personne change son mot de passe elle-même. Utilise le lien de réinitialisation pour lui en fixer un nouveau.</p>
       <div class="carte">
         <table class="tableau-donnees" id="table-motsdepasse">
-          <thead><tr><th>Nom</th><th>Identifiant</th><th>Mot de passe</th><th>Rôle</th><th>Dernière connexion</th><th>Réinitialiser</th></tr></thead>
+          <thead><tr><th>Nom</th><th>Identifiant</th><th>Mot de passe</th><th>Rôle</th><th>Dernière connexion</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="6" class="message-vide">Chargement...</td></tr></tbody>
         </table>
+        <div id="motsdepasse-bandeau" class="bandeau"></div>
       </div>
     </section>
 

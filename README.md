@@ -1,6 +1,6 @@
 # Mecadacty — Site internet
 
-Version : **V01-016**
+Version : **V01-018**
 
 ## Structure du dépôt GitHub
 Tous les fichiers sont à la racine (HTML, CSS, JS), avec un seul
@@ -33,18 +33,24 @@ dossier `assets/` pour les images — pas de sous-dossiers.
 ## Collections Firestore
 
 ### `utilisateurs`
+**L'ID du document est l'UID Firebase Authentication de la personne** (plus un ID auto).
 | Champ | Type | Description |
 |---|---|---|
 | nom, prenom | string | Identité |
 | gsm, email | string | Coordonnées (email généré automatiquement si non fourni : `identifiant@mecadacty.be`) |
-| identifiant | string | Login (sans caractères spéciaux) |
-| motDePasse | string | Mot de passe en clair (voir note sécurité ci-dessous) |
+| identifiant | string | "User" affiché à la connexion (sans caractères spéciaux) |
+| motDePasse | string | Copie de confort du mot de passe, visible par le Super Admin (risque connu et accepté) — ne se met pas à jour automatiquement si la personne change son mot de passe elle-même |
 | role | string | `"admin"` ou `"client"` |
 | estSuperAdmin | boolean | `true` uniquement pour le compte `HeleneL` |
 | derniereConnexion | timestamp | Mise à jour à chaque connexion réussie |
-| dateReinitialisationMdp | timestamp | Mise à jour lors d'une réinitialisation |
 | dateCreation | timestamp | Date de création du compte |
 | nbDossiers | number | Compteur (informatif) |
+
+### `identifiantsPublics`
+**L'ID du document est l'identifiant texte** (ex. `HeleneL`, `katia.r`). Lecture publique nécessaire pour retrouver l'e-mail associé à un "User" avant la connexion — ne contient jamais de mot de passe.
+| Champ | Type | Description |
+|---|---|---|
+| email | string | E-mail Firebase Authentication associé à cet identifiant |
 
 ### `dossiers`
 | Champ | Type | Description |
@@ -111,25 +117,35 @@ Un seul document contenant toutes les clés de texte éditable des
 pages publiques (voir la liste dans `admin.js`, section "Contenu du
 site").
 
-## Sécurité — note importante
-L'authentification est "maison" (identifiant/mot de passe comparés
-côté client, pas Firebase Authentication). C'est volontairement
-simple pour rester gratuit, comme pour le site des Cabots de
-Fernelmont à ses débuts — mais cela veut dire que les règles
-Firestore actuelles (`firestore.rules`) sont ouvertes : à resserrer
-plus tard si des données sensibles étaient stockées.
+## Sécurité
+Le site utilise **Firebase Authentication** (e-mail/mot de passe) — Firestore
+n'a jamais accès aux mots de passe, et les règles (`firestore.rules`)
+vérifient réellement l'identité de la personne connectée : un client ne
+peut lire/écrire que ses propres données, seul un compte `admin` voit tout.
+Reste gratuit (offre gratuite Firebase Authentication largement suffisante
+pour ce volume d'utilisateurs).
+
+## Migration vers Firebase Authentication (V01-018)
+
+Le site utilise maintenant une vraie authentification Firebase (et non plus des mots de passe stockés en clair dans Firestore). **Étapes à suivre dans la console Firebase, dans cet ordre :**
+
+1. **Authentication → Sign-in method** → activer la méthode **E-mail/Mot de passe**.
+2. **Authentication → Users → Add user**, créer les 2 comptes existants :
+   - `helenel@mecadacty.be` / mot de passe `Helene123` → **noter l'UID généré**
+   - `katia.r@mecadacty.be` / mot de passe `Katia5300` → **noter l'UID généré**
+3. **Firestore → collection `utilisateurs`** : supprimer les 2 anciens documents (ceux créés manuellement, avec un champ `motDePasse`). Recréer 2 nouveaux documents dont **l'ID du document est exactement l'UID noté à l'étape 2** (et non un ID auto) :
+   - Document `{UID de Hélène}` : `identifiant: HeleneL`, `email: helenel@mecadacty.be`, `nom: Laruelle`, `prenom: Hélène`, `role: admin`, `estSuperAdmin: true`, `motDePasse: Helene123`, `derniereConnexion: null`
+   - Document `{UID de Katia}` : `identifiant: katia.r`, `email: katia.r@mecadacty.be`, `nom: Renard`, `prenom: Katia`, `role: admin`, `estSuperAdmin: false`, `motDePasse: Katia5300`, `derniereConnexion: null`, `nbDossiers: 0`
+   - Le champ `motDePasse` est une copie de confort pour l'onglet "Mots de passe" (Super Admin) — pas la vraie source de vérité pour la connexion, qui reste gérée par Firebase Authentication.
+4. **Firestore → collection `identifiantsPublics`** (nouvelle, à créer) : 2 documents, dont **l'ID du document est l'identifiant texte lui-même** :
+   - Document `HeleneL` : `{ email: "helenel@mecadacty.be" }`
+   - Document `katia.r` : `{ email: "katia.r@mecadacty.be" }`
+5. **Firestore → Règles** : coller le contenu de `firestore.rules` (fourni dans ce zip) et cliquer sur **Publier**.
+6. Tester la connexion avec `HeleneL` / `Helene123` puis `katia.r` / `Katia5300`.
+
+Les futurs comptes clients créés depuis l'Admin passent maintenant automatiquement par ce système (plus besoin de manipulation manuelle).
 
 ## À faire avant mise en ligne
-1. Créer le projet Firebase **"mecadacty"** (Firestore Database)
-2. Compléter `firebase-config.js` avec les identifiants du projet
-3. Créer le compte **Super Admin** directement dans Firestore,
-   collection `utilisateurs` :
-   - `identifiant`: `HeleneL`
-   - `motDePasse`: `Helene123`
-   - `role`: `admin`
-   - `estSuperAdmin`: `true`
-   - `nom`: `Laruelle`, `prenom`: `Hélène`
-4. Créer le compte **Admin** de Katia de la même façon (`role: admin`,
-   `estSuperAdmin: false`)
-5. Compléter les coordonnées réelles sur la page Contact
-6. Les 3 pages légales (Cookies, RGPD, CGV) sont déjà rédigées avec les informations disponibles — à relire/ajuster si besoin
+1. Suivre la migration Firebase Authentication ci-dessus
+2. Compléter les coordonnées réelles sur la page Contact si besoin
+3. Les 3 pages légales (Cookies, RGPD, CGV) sont déjà rédigées avec les informations disponibles — à relire/ajuster si besoin

@@ -1,16 +1,17 @@
 // ============================================================
-// Projet Firebase : mecadacty
+// Projet Firebase : mecadacty-51f6f
 // Référence projet : Mecadacty — site internet
-// Version du site : V01-016
+// Version du site : V01-018
+// Authentification : Firebase Authentication (Email/Mot de passe)
 // ============================================================
-// NOTE IMPORTANTE : ces règles sont un point de départ simple.
-// L'authentification "maison" (identifiant/mot de passe stockés
-// dans Firestore, comparés côté client) ne permet pas à Firestore
-// de savoir QUI écrit réellement. Tant que Firebase Authentication
-// n'est pas branché, ces règles ouvrent large (comme pour le site
-// des Cabots de Fernelmont à ses débuts) : c'est un choix delibéré
-// pour rester 100% gratuit et simple à ce stade, à resserrer plus
-// tard si des données sensibles venaient à être stockées.
+// Ces règles vérifient réellement l'identité de la personne
+// connectée (request.auth) — contrairement aux anciennes règles
+// ouvertes, ici un client ne peut lire/écrire QUE ses propres
+// données, et seul un compte "admin" peut tout voir.
+// Note : le document "utilisateurs" contient un champ motDePasse
+// (copie de confort demandée par Hélène pour le Super Admin,
+// risque connu et accepté) — protégé par les mêmes règles de
+// lecture (soi-même ou un compte admin), jamais public.
 // ============================================================
 
 rules_version = '2';
@@ -18,42 +19,79 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Collection "utilisateurs" : Super Admin, Admin, Membres (clients)
+    function estConnecte() {
+      return request.auth != null;
+    }
+
+    function monProfil() {
+      return get(/databases/$(database)/documents/utilisateurs/$(request.auth.uid)).data;
+    }
+
+    function estAdmin() {
+      return estConnecte() && monProfil().role == "admin";
+    }
+
+    function estProprietaire(clientId) {
+      return estConnecte() && request.auth.uid == clientId;
+    }
+
+    // Mapping public "identifiant -> email", nécessaire pour retrouver
+    // l'e-mail associé à un "User" AVANT la connexion (ne contient aucun
+    // mot de passe : Firebase Authentication les gère lui-même, en dehors
+    // de Firestore).
+    match /identifiantsPublics/{identifiant} {
+      allow read: if true;
+      allow write: if estAdmin();
+    }
+
+    // Profils (Super Admin / Admin / Client) — l'ID du document EST l'UID
+    // Firebase Authentication de la personne.
     match /utilisateurs/{userId} {
-      allow read, write: if true;
+      allow read: if estAdmin() || estProprietaire(userId);
+      allow write: if estAdmin();
     }
 
     match /dossiers/{dossierId} {
-      allow read, write: if true;
+      allow read: if estAdmin() || estProprietaire(resource.data.clientId);
+      allow create, update, delete: if estAdmin();
     }
 
     match /rdv/{rdvId} {
-      allow read, write: if true;
+      allow read: if estAdmin() || estProprietaire(resource.data.clientId);
+      allow create: if estAdmin() || estProprietaire(request.resource.data.clientId);
+      allow update, delete: if estAdmin();
+    }
+
+    match /messages/{messageId} {
+      allow read: if estAdmin() || estProprietaire(resource.data.clientId);
+      allow create: if estAdmin() || estProprietaire(request.resource.data.clientId);
+      allow update: if estAdmin() || estProprietaire(resource.data.clientId);
+      allow delete: if estAdmin();
+    }
+
+    match /heures/{heureId} {
+      allow read: if estAdmin() || estProprietaire(resource.data.clientId);
+      allow write: if estAdmin();
     }
 
     match /demandesInscription/{demandeId} {
-      allow read, write: if true;
+      allow create: if true;
+      allow read, update, delete: if estAdmin();
     }
 
     match /messagesContact/{messageId} {
-      allow read, write: if true;
+      allow create: if true;
+      allow read, update, delete: if estAdmin();
     }
 
     match /contenu/{docId} {
       allow read: if true;
-      allow write: if true;
+      allow write: if estAdmin();
     }
 
     match /articles/{articleId} {
-      allow read, write: if true;
-    }
-
-    match /messages/{messageId} {
-      allow read, write: if true;
-    }
-
-    match /heures/{heureId} {
-      allow read, write: if true;
+      allow read: if resource.data.visible == true || estAdmin();
+      allow write: if estAdmin();
     }
   }
 }

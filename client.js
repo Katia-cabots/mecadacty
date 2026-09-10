@@ -2,27 +2,50 @@
 // MECADACTY — Espace Client
 // ============================================================
 
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 import { VERSION_SITE } from "./version.js";
 import { afficherBandeau } from "./interface.js";
 import {
-  collection, addDoc, getDocs, doc, updateDoc, query, where, serverTimestamp
+  collection, addDoc, getDocs, doc, getDoc, updateDoc, query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ---------- Garde d'accès ----------
+// ---------- Garde d'accès (session pour l'affichage immédiat) ----------
 const utilisateurBrut = sessionStorage.getItem("mecadacty_utilisateur");
 if (!utilisateurBrut) {
   window.location.href = "connexion.html";
 }
-const utilisateur = utilisateurBrut ? JSON.parse(utilisateurBrut) : null;
+let utilisateur = utilisateurBrut ? JSON.parse(utilisateurBrut) : null;
 if (utilisateur && utilisateur.role !== "client") {
   window.location.href = "admin.html";
 }
 
 document.getElementById("version-tag").textContent = VERSION_SITE;
 
-document.getElementById("btn-deconnexion").addEventListener("click", () => {
+// ---------- Garde d'accès réelle : vérifie la session Firebase Authentication ----------
+onAuthStateChanged(auth, async (utilisateurFirebase) => {
+  if (!utilisateurFirebase) {
+    sessionStorage.removeItem("mecadacty_utilisateur");
+    window.location.href = "connexion.html";
+    return;
+  }
+  try {
+    const snapProfil = await getDoc(doc(db, "utilisateurs", utilisateurFirebase.uid));
+    if (!snapProfil.exists() || snapProfil.data().role !== "client") {
+      window.location.href = "connexion.html";
+      return;
+    }
+    utilisateur = { id: utilisateurFirebase.uid, ...snapProfil.data() };
+    sessionStorage.setItem("mecadacty_utilisateur", JSON.stringify(utilisateur));
+    document.getElementById("salutation-client").textContent = `Bonjour, ${utilisateur.prenom}`;
+  } catch (err) {
+    console.warn("Impossible de vérifier le profil connecté :", err);
+  }
+});
+
+document.getElementById("btn-deconnexion").addEventListener("click", async () => {
   sessionStorage.removeItem("mecadacty_utilisateur");
+  try { await signOut(auth); } catch (err) { console.warn(err); }
   window.location.href = "connexion.html";
 });
 

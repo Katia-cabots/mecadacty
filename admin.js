@@ -2,14 +2,19 @@
 // MECADACTY — Espace Admin / Super Admin
 // ============================================================
 
-import { db } from "./firebase-config.js";
+import { db, auth, firebaseConfig } from "./firebase-config.js";
 import { VERSION_SITE } from "./version.js";
 import { afficherBandeau } from "./interface.js";
 import {
-  collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc, deleteField, query, where, serverTimestamp
+  collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  onAuthStateChanged, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword,
+  getAuth
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeApp as initialiserAppSecondaire, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-// ---------- Garde d'accès ----------
+// ---------- Garde d'accès (session pour l'affichage immédiat) ----------
 const utilisateurBrut = sessionStorage.getItem("mecadacty_utilisateur");
 if (!utilisateurBrut) {
   window.location.href = "connexion.html";
@@ -43,27 +48,32 @@ function appliquerAffichageRole() {
 
 appliquerAffichageRole();
 
-// Rafraîchit les données utilisateur depuis Firestore (évite un affichage
-// erroné du rôle si la session en cache est ancienne ou incomplète)
-async function rafraichirUtilisateur() {
-  if (!utilisateur || !utilisateur.identifiant) return;
-  try {
-    const q = query(collection(db, "utilisateurs"), where("identifiant", "==", utilisateur.identifiant));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      const frais = { id: snap.docs[0].id, ...snap.docs[0].data() };
-      utilisateur = frais;
-      sessionStorage.setItem("mecadacty_utilisateur", JSON.stringify(utilisateur));
-      appliquerAffichageRole();
-    }
-  } catch (err) {
-    console.warn("Impossible de rafraîchir les données utilisateur :", err);
+// ---------- Garde d'accès réelle : vérifie la session Firebase Authentication ----------
+// (si le cache de session existe mais qu'il n'y a pas de vraie session Firebase
+// Auth active — déconnexion, expiration... — on renvoie vers la connexion)
+onAuthStateChanged(auth, async (utilisateurFirebase) => {
+  if (!utilisateurFirebase) {
+    sessionStorage.removeItem("mecadacty_utilisateur");
+    window.location.href = "connexion.html";
+    return;
   }
-}
-rafraichirUtilisateur();
+  try {
+    const snapProfil = await getDoc(doc(db, "utilisateurs", utilisateurFirebase.uid));
+    if (!snapProfil.exists() || snapProfil.data().role !== "admin") {
+      window.location.href = "connexion.html";
+      return;
+    }
+    utilisateur = { id: utilisateurFirebase.uid, ...snapProfil.data() };
+    sessionStorage.setItem("mecadacty_utilisateur", JSON.stringify(utilisateur));
+    appliquerAffichageRole();
+  } catch (err) {
+    console.warn("Impossible de vérifier le profil connecté :", err);
+  }
+});
 
-document.getElementById("btn-deconnexion").addEventListener("click", () => {
+document.getElementById("btn-deconnexion").addEventListener("click", async () => {
   sessionStorage.removeItem("mecadacty_utilisateur");
+  try { await signOut(auth); } catch (err) { console.warn(err); }
   window.location.href = "connexion.html";
 });
 
@@ -183,6 +193,23 @@ async function chargerClients() {
   }
 }
 
+// Crée un compte Firebase Authentication sans déconnecter l'admin en cours
+// (utilise une app Firebase secondaire temporaire, comme recommandé par Firebase
+// pour créer un compte depuis une session admin déjà connectée)
+async function creerCompteFirebaseAuth(email, motDePasse) {
+  const appSecondaire = initialiserAppSecondaire(firebaseConfig, "secondaire-" + Date.now());
+  const authSecondaire = getAuth(appSecondaire);
+  try {
+    const identifiants = await createUserWithEmailAndPassword(authSecondaire, email, motDePasse);
+    const uid = identifiants.user.uid;
+    await deleteApp(appSecondaire);
+    return uid;
+  } catch (err) {
+    await deleteApp(appSecondaire);
+    throw err;
+  }
+}
+
 document.getElementById("btn-ajouter-client").addEventListener("click", async () => {
   const nom = document.getElementById("cl-nom").value.trim();
   const prenom = document.getElementById("cl-prenom").value.trim();
@@ -201,21 +228,32 @@ document.getElementById("btn-ajouter-client").addEventListener("click", async ()
     afficherBandeau("clients-bandeau", "Impossible de générer l'identifiant ou le mot de passe : renseignez au moins le nom, le prénom et la date de naissance, ou saisissez-les manuellement.", "erreur");
     return;
   }
+  if (motDePasse.length < 6) {
+    afficherBandeau("clients-bandeau", "Le mot de passe doit faire au moins 6 caractères (exigence de Firebase Authentication).", "erreur");
+    return;
+  }
   if (!email) email = `${identifiant}@mecadacty.be`; // e-mail généré par défaut si non fourni
 
   try {
-    await addDoc(collection(db, "utilisateurs"), {
+    const uid = await creerCompteFirebaseAuth(email, motDePasse);
+
+    await setDoc(doc(db, "utilisateurs", uid), {
       nom, prenom, gsm, email, identifiant, motDePasse,
       role: "client", estSuperAdmin: false, nbDossiers: 0,
       dateCreation: serverTimestamp(), derniereConnexion: null
     });
-    afficherBandeau("clients-bandeau", `Client ajouté. Identifiant : ${identifiant} — Mot de passe : ${motDePasse}`, "succes");
+    await setDoc(doc(db, "identifiantsPublics", identifiant), { email });
+
+    afficherBandeau("clients-bandeau", `Client ajouté. Identifiant : ${identifiant} — mot de passe : ${motDePasse} (aussi consultable dans l'onglet Comptes).`, "succes");
     ["cl-nom","cl-prenom","cl-naissance","cl-gsm","cl-email","cl-identifiant","cl-motdepasse"].forEach(id => document.getElementById(id).value = "");
     chargerClients();
     chargerTableauDeBord();
   } catch (err) {
     console.error(err);
-    afficherBandeau("clients-bandeau", "Erreur lors de l'ajout du client. Vérifiez la connexion à Firebase et réessayez.", "erreur");
+    let message = "Erreur lors de l'ajout du client. Vérifiez la connexion à Firebase et réessayez.";
+    if (err.code === "auth/email-already-in-use") message = "Cet e-mail est déjà utilisé par un autre compte.";
+    if (err.code === "auth/invalid-email") message = "L'e-mail généré n'est pas valide.";
+    afficherBandeau("clients-bandeau", message, "erreur");
   }
 });
 
@@ -739,7 +777,13 @@ document.getElementById("btn-reinit-contenu").addEventListener("click", async ()
   }
 });
 
-// ---------- Mots de passe (Super Admin uniquement) ----------
+// ---------- Comptes (Super Admin uniquement) ----------
+// Le mot de passe stocké ici est une copie de confort pour le Super Admin
+// (risque connu et accepté) — il reflète le mot de passe donné à la création
+// du compte, mais NE SE MET PAS À JOUR automatiquement si la personne change
+// son mot de passe elle-même (Firebase Authentication ne renvoie jamais un
+// mot de passe existant, seul un lien de réinitialisation par e-mail permet
+// d'en fixer un nouveau à distance).
 async function chargerMotsDePasse() {
   if (!utilisateur || utilisateur.estSuperAdmin !== true) return;
   const corps = document.querySelector("#table-motsdepasse tbody");
@@ -754,24 +798,38 @@ async function chargerMotsDePasse() {
       return `<tr>
         <td>${data.prenom} ${data.nom}</td>
         <td>${data.identifiant}</td>
-        <td>${data.motDePasse}</td>
+        <td>${data.motDePasse || "—"}</td>
         <td>${data.estSuperAdmin ? "Super Admin" : (data.role === "admin" ? "Admin" : "Client")}</td>
         <td>${formaterDate(data.derniereConnexion)}</td>
-        <td><button class="bouton-mini-discret btn-reinit" data-id="${d.id}" data-prenom="${data.prenom}" data-nom="${data.nom}">Réinitialiser</button></td>
+        <td>
+          <button class="bouton-mini-discret btn-modifier-mdp-affiche" data-id="${d.id}">Modifier l'affichage</button><br>
+          <button class="bouton-mini-discret btn-reinit" data-email="${data.email}">Lien de réinitialisation</button>
+        </td>
       </tr>`;
     }).join("");
 
     document.querySelectorAll(".btn-reinit").forEach(bouton => {
       bouton.addEventListener("click", async () => {
-        const nouveauMdp = suggererMotDePasse(bouton.dataset.prenom, bouton.dataset.nom, "2000-01-01").slice(0, 6) + Math.floor(Math.random() * 90 + 10);
         try {
-          await updateDoc(doc(db, "utilisateurs", bouton.dataset.id), {
-            motDePasse: nouveauMdp,
-            dateReinitialisationMdp: serverTimestamp()
-          });
+          await sendPasswordResetEmail(auth, bouton.dataset.email);
+          afficherBandeau("motsdepasse-bandeau", `Lien de réinitialisation envoyé à ${bouton.dataset.email}.`, "succes");
+        } catch (err) {
+          console.error(err);
+          afficherBandeau("motsdepasse-bandeau", "Erreur lors de l'envoi du lien de réinitialisation.", "erreur");
+        }
+      });
+    });
+
+    document.querySelectorAll(".btn-modifier-mdp-affiche").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        const nouveau = window.prompt("Nouveau mot de passe à afficher ici (ne change PAS le vrai mot de passe de connexion — à utiliser seulement si tu sais que la personne l'a changé ailleurs) :");
+        if (!nouveau) return;
+        try {
+          await updateDoc(doc(db, "utilisateurs", bouton.dataset.id), { motDePasse: nouveau });
           chargerMotsDePasse();
         } catch (err) {
           console.error(err);
+          afficherBandeau("motsdepasse-bandeau", "Erreur lors de la mise à jour.", "erreur");
         }
       });
     });
