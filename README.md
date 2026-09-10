@@ -1,6 +1,6 @@
-# Mecadacty — Site internet
+# mecadacty — Site internet
 
-Version : **V01-022**
+Version : **V01-024**
 
 ## Structure du dépôt GitHub
 Tous les fichiers sont à la racine (HTML, CSS, JS), avec un seul
@@ -26,7 +26,7 @@ dossier `assets/` pour les images — pas de sous-dossiers.
   et mot de passe (lettres, chiffres, points, tirets uniquement)
 - **Numéro de version** affiché dans l'en-tête Admin/Membre et en
   commentaire dans `firestore.rules`
-- **Logo Mecadacty** (fourni) intégré dans l'en-tête de toutes les
+- **Logo mecadacty** (fourni) intégré dans l'en-tête de toutes les
   pages publiques
 - Badge personnel HL en SVG (bas droite des pages publiques uniquement)
 
@@ -133,7 +133,7 @@ peut lire/écrire que ses propres données, seul un compte `admin` voit tout.
 Reste gratuit (offre gratuite Firebase Authentication largement suffisante
 pour ce volume d'utilisateurs).
 
-## Migration vers Firebase Authentication (V01-022)
+## Migration vers Firebase Authentication (V01-024)
 
 Le site utilise maintenant une vraie authentification Firebase (et non plus des mots de passe stockés en clair dans Firestore). **Étapes à suivre dans la console Firebase, dans cet ordre :**
 

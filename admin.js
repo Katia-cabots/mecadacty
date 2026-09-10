@@ -888,7 +888,6 @@ async function chargerMotsDePasse() {
         <td>${data.estSuperAdmin ? "Super Admin" : (data.role === "admin" ? "Admin" : "Client")}</td>
         <td>${formaterDate(data.derniereConnexion)}</td>
         <td>
-          <button class="bouton-mini-discret btn-modifier-mdp-affiche" data-id="${d.id}">Modifier l'affichage</button><br>
           <button class="bouton-mini-discret btn-reinit" data-email="${data.email}">Lien de réinitialisation</button>
         </td>
       </tr>`;
@@ -902,20 +901,6 @@ async function chargerMotsDePasse() {
         } catch (err) {
           console.error(err);
           afficherBandeau("motsdepasse-bandeau", "Erreur lors de l'envoi du lien de réinitialisation.", "erreur");
-        }
-      });
-    });
-
-    document.querySelectorAll(".btn-modifier-mdp-affiche").forEach(bouton => {
-      bouton.addEventListener("click", async () => {
-        const nouveau = window.prompt("Nouveau mot de passe à afficher ici (ne change PAS le vrai mot de passe de connexion — à utiliser seulement si tu sais que la personne l'a changé ailleurs) :");
-        if (!nouveau) return;
-        try {
-          await updateDoc(doc(db, "utilisateurs", bouton.dataset.id), { motDePasse: nouveau });
-          chargerMotsDePasse();
-        } catch (err) {
-          console.error(err);
-          afficherBandeau("motsdepasse-bandeau", "Erreur lors de la mise à jour.", "erreur");
         }
       });
     });

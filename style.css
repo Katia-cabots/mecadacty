@@ -7,16 +7,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  --bleu-profond: #1F3A5F;
-  --bleu-moyen: #3D6D99;
+  --bleu-profond: #14456E;
+  --bleu-moyen: #247CC3;
   --gris-ardoise: #5B6B79;
   --gris-clair: #E7EBEE;
   --fond: #F5F7F9;
   --blanc: #FFFFFF;
   --texte: #1D2530;
   --texte-doux: #56626E;
-  --or: #C9A227;
-  --succes: #2E7D5B;
+  --rose: #C93A8C;
+  --succes: #4FA84A;
   --alerte: #B5484D;
 
   --serif: 'Source Serif 4', Georgia, serif;
@@ -89,17 +89,41 @@ a { color: var(--bleu-moyen); }
 .entete-marque img.logo-site {
   height: 46px;
   width: auto;
+  border-radius: 10px;
 }
 
 .entete-marque img.logo-site-accueil {
-  height: 68px;
+  height: 64px;
+  border-radius: 14px;
 }
 
 @media (max-width: 560px) {
-  .entete-marque img.logo-site-accueil { height: 52px; }
+  .entete-marque img.logo-site-accueil { height: 48px; }
 }
 
+.logo-icone-texte {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icone-texte .nom-site-texte {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--bleu-profond);
+}
+
+.logo-icone-texte-empile {
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+.logo-icone-texte-empile .nom-site-texte { font-size: 1rem; }
+
 .entete-marque-bloc {
+  align-items: center;
+  gap: 18px;
   background: var(--fond);
   border-radius: var(--rayon);
   padding: 8px 16px;
@@ -110,7 +134,7 @@ a { color: var(--bleu-moyen); }
   font-size: 0.9rem;
   line-height: 1.35;
   color: var(--texte-doux);
-  border-left: 2px solid var(--or);
+  border-left: 2px solid var(--rose);
   padding-left: 12px;
   max-width: 170px;
 }
@@ -151,7 +175,7 @@ nav.entete-nav a {
 
 nav.entete-nav a:hover,
 nav.entete-nav a.actif {
-  border-bottom-color: var(--or);
+  border-bottom-color: var(--rose);
   color: var(--bleu-profond);
 }
 
@@ -230,10 +254,10 @@ nav.entete-nav a.actif {
 }
 
 .bouton-primaire {
-  background: var(--or);
-  color: var(--bleu-profond);
+  background: var(--rose);
+  color: var(--blanc);
 }
-.bouton-primaire:hover { background: #DDB93A; }
+.bouton-primaire:hover { background: #A82E73; }
 
 .bouton-secondaire {
   background: transparent;
@@ -263,7 +287,7 @@ nav.entete-nav a.actif {
 .carte-service {
   background: var(--blanc);
   border: 1px solid var(--gris-clair);
-  border-left: 3px solid var(--or);
+  border-left: 3px solid var(--rose);
   border-radius: var(--rayon);
   padding: 22px;
 }
@@ -418,7 +442,7 @@ nav.entete-nav a.actif {
 .carte-temoignage .guillemet {
   font-family: var(--serif);
   font-size: 2.4rem;
-  color: var(--or);
+  color: var(--rose);
   line-height: 1;
   display: block;
   margin-bottom: 4px;
@@ -486,7 +510,7 @@ nav.entete-nav a.actif {
   height: 88px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--or);
+  border: 2px solid var(--rose);
   background: var(--blanc);
 }
 
@@ -499,7 +523,7 @@ nav.entete-nav a.actif {
 .carte-identite-infos h3 { margin-bottom: 2px; font-size: 1.1rem; }
 
 .carte-identite-societe {
-  color: var(--or);
+  color: var(--rose);
   font-weight: 700;
   font-size: 0.78rem;
   letter-spacing: 0.03em;
@@ -582,7 +606,7 @@ footer.pied a { color: #C8D4DE; }
   border-radius: 50%;
   object-fit: cover;
   background: var(--blanc);
-  border: 2px solid var(--or);
+  border: 2px solid var(--rose);
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
@@ -698,13 +722,13 @@ footer.pied a { color: #C8D4DE; }
   display: inline-block;
   margin-top: 3px;
   font-size: 0.7rem;
-  background: var(--or);
-  color: var(--bleu-profond);
+  background: var(--rose);
+  color: var(--blanc);
   padding: 2px 8px;
   border-radius: 10px;
   font-weight: 700;
 }
-.app-entete-titre-bloc .badge-role.role-superadmin { background: #F0D98C; }
+.app-entete-titre-bloc .badge-role.role-superadmin { background: #55B14E; color: var(--blanc); }
 .app-entete-titre-bloc .badge-role.role-client { background: var(--gris-clair); color: var(--bleu-profond); }
 .app-entete-titre-bloc .version-tag {
   font-size: 0.68rem;
@@ -753,7 +777,7 @@ footer.pied a { color: #C8D4DE; }
 .app-menu button:hover, .app-menu a:hover,
 .app-menu button.actif, .app-menu a.actif {
   background: var(--fond);
-  border-left-color: var(--or);
+  border-left-color: var(--rose);
   color: var(--bleu-profond);
   font-weight: 600;
 }
@@ -848,5 +872,5 @@ table.tableau-donnees th { color: var(--gris-ardoise); font-weight: 600; font-si
   .app-layout { flex-direction: column; }
   .app-menu { width: 100%; display: flex; overflow-x: auto; padding: 8px; }
   .app-menu button, .app-menu a { width: auto; white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
-  .app-menu button.actif, .app-menu a.actif, .app-menu button:hover, .app-menu a:hover { border-left: none; border-bottom-color: var(--or); }
+  .app-menu button.actif, .app-menu a.actif, .app-menu button:hover, .app-menu a:hover { border-left: none; border-bottom-color: var(--rose); }
 }
