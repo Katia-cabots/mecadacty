@@ -1,7 +1,7 @@
 // ============================================================
 // Projet Firebase : mecadacty
 // Référence projet : Mecadacty — site internet
-// Version du site : V01-010
+// Version du site : V01-016
 // ============================================================
 // NOTE IMPORTANTE : ces règles sont un point de départ simple.
 // L'authentification "maison" (identifiant/mot de passe stockés
@@ -42,6 +42,18 @@ service cloud.firestore {
     match /contenu/{docId} {
       allow read: if true;
       allow write: if true;
+    }
+
+    match /articles/{articleId} {
+      allow read, write: if true;
+    }
+
+    match /messages/{messageId} {
+      allow read, write: if true;
+    }
+
+    match /heures/{heureId} {
+      allow read, write: if true;
     }
   }
 }

@@ -5,6 +5,16 @@
 import { VERSION_SITE } from "./version.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Bouton "Retour à l'accueil" fixe en haut à droite, sur tout le site
+  if (!document.getElementById("bouton-accueil-global")) {
+    const lien = document.createElement("a");
+    lien.id = "bouton-accueil-global";
+    lien.href = "index.html";
+    lien.title = "Retour à l'accueil";
+    lien.textContent = "🏠";
+    document.body.appendChild(lien);
+  }
+
   // Numéro de version dans le pied de page public
   const versionEl = document.getElementById("pied-version");
   if (versionEl) versionEl.textContent = "Version " + VERSION_SITE;

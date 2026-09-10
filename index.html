@@ -3,21 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mecadacty — Secrétariat &amp; gestion administrative à Wasseiges</title>
-<meta name="description" content="Mecadacty, gérée par Katia Renard (Wasseiges), accompagne les indépendants et petites entreprises dans leur gestion administrative : frappe, secrétariat, remplacements.">
+<title>Mecadacty — Secrétariat 3.0 pour indépendants, TPE et PME à Wasseiges</title>
+<meta name="description" content="Dépassé par l'administratif ? Mecadacty, gérée par Katia Renard (Wasseiges), devient votre partenaire du quotidien : indépendants, TPE, PME — quelques heures ponctuelles ou de façon structurelle.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="entete">
   <div class="entete-barre">
-    <a href="index.html" class="entete-marque">
+    <a href="index.html" class="entete-marque entete-marque-bloc">
       <img src="assets/logo-mecadacty.jpg" alt="Mecadacty — gérée par Katia Renard, Wasseiges" class="logo-site logo-site-accueil">
+      <span class="slogan-bloc" data-contenu="slogan_site">Votre partenaire administratif à Wasseiges</span>
     </a>
     <button class="menu-mobile-toggle" aria-label="Ouvrir le menu">☰</button>
     <nav class="entete-nav">
       <a href="index.html" class="actif">Accueil</a>
       <a href="services.html">Services</a>
+      <a href="actualites.html">Actualités</a>
       <a href="apropos.html">À propos</a>
       <a href="contact.html">Contact</a>
       <a href="connexion.html" class="bouton-connexion">Espace client</a>
@@ -27,9 +29,9 @@
 
 <section class="heros">
   <div class="container">
-    <p class="eyebrow" style="color:#DCE6EE;" data-contenu="slogan_site">Votre partenaire administratif à Wasseiges</p>
-    <h1 data-contenu="accueil_titre">Votre bureau, entre de bonnes mains.</h1>
-    <p class="chapo" data-contenu="accueil_chapo">Mecadacty prend en charge la gestion administrative de votre activité — frappe de documents, suivi de dossiers, remplacements ponctuels — pour vous laisser du temps pour l'essentiel.</p>
+    <p class="eyebrow" style="color:#DCE6EE;" data-contenu="accueil_eyebrow">Secrétariat 3.0</p>
+    <h1 data-contenu="accueil_titre">Dépassé par l'administratif ? Faites appel à Mecadacty.</h1>
+    <p class="chapo" data-contenu="accueil_chapo">Votre temps est précieux — vous avez mieux à faire que votre administratif. Faites de Katia votre partenaire du quotidien pour souffler sur toute la partie admin : indépendant, TPE ou PME, pour quelques heures ponctuelles ou de manière structurelle.</p>
     <div class="heros-actions">
       <a href="contact.html" class="bouton-primaire">Demander un devis</a>
       <a href="services.html" class="bouton-secondaire">Voir les services</a>
@@ -43,7 +45,7 @@
     <h2 data-contenu="accueil_services_titre">Un appui administratif large, adapté à vos besoins</h2>
     <div class="grille-services">
       <div class="carte-service">
-        <h3>Frappe de documents</h3>
+        <h3>Dactylographie</h3>
         <p>Courriers, rapports, comptes-rendus, mise en forme de tous types de documents.</p>
       </div>
       <div class="carte-service">
@@ -72,6 +74,30 @@
   </div>
 </section>
 
+<section class="section">
+  <div class="container">
+    <p class="eyebrow">Ils lui font confiance</p>
+    <h2 data-contenu="temoignages_titre">Ce qu'en disent les clients de Mecadacty</h2>
+    <div class="grille-temoignages">
+      <div class="carte-temoignage">
+        <span class="guillemet">"</span>
+        <p class="citation" data-contenu="temoignage1_texte">Katia a repris la gestion administrative de mon cabinet en quelques jours seulement. Un vrai soulagement.</p>
+        <p class="auteur" data-contenu="temoignage1_auteur">— Client indépendant, Wasseiges</p>
+      </div>
+      <div class="carte-temoignage">
+        <span class="guillemet">"</span>
+        <p class="citation" data-contenu="temoignage2_texte">Rigoureuse et toujours disponible : exactement ce qu'il me fallait pendant mon remplacement de congé maternité.</p>
+        <p class="auteur" data-contenu="temoignage2_auteur">— Petite entreprise locale</p>
+      </div>
+      <div class="carte-temoignage">
+        <span class="guillemet">"</span>
+        <p class="citation" data-contenu="temoignage3_texte">Un vrai gain de temps sur toute la partie administrative — je peux enfin me concentrer sur mon activité.</p>
+        <p class="auteur" data-contenu="temoignage3_auteur">— Profession libérale</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer class="pied">
   <div class="container pied-barre">
     <div class="pied-copyright">
@@ -79,31 +105,13 @@
       Contenu sous la responsabilité de Katia Renard
     </div>
     <div class="pied-liens">
-      <a href="securisation.html">Sécurisation</a> |
-      <a href="confidentialite.html">Déclaration de confidentialité</a> |
-      <a href="ethique.html">Business Ethics &amp; Governance</a> |
-      <a href="cookies.html">Politique en matière de cookies</a> |
-      <a href="responsabilite.html">Limitation de responsabilité</a> |
-      <a href="mentions.html">Mentions légales / RGPD / CGV</a>
+      <a href="cookies.html">Cookies</a> |
+      <a href="confidentialite.html">RGPD</a> |
+      <a href="cgv.html">CGV</a>
     </div>
     <div class="pied-tva">TVA <span data-contenu="identite_tva">BE 0729.593.814</span></div>
     <div class="pied-version" id="pied-version"></div>
-    <svg class="logo-hl-inline" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo personnel Helene Laruelle">
-      <defs>
-        <radialGradient id="degradeOrHL_index" cx="35%" cy="30%" r="75%">
-          <stop offset="0%" stop-color="#F6E27A"/>
-          <stop offset="100%" stop-color="#C9A227"/>
-        </radialGradient>
-      </defs>
-      <circle cx="28" cy="30" r="26" fill="url(#degradeOrHL_index)" stroke="#1F3A5F" stroke-width="1"/>
-      <text x="28" y="38" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-weight="700" font-size="22" fill="#1F3A5F" text-anchor="middle">HL</text>
-      <g transform="translate(44,4) rotate(45)">
-        <path d="M0 10 L3 0 L6 10 Z" fill="#1F3A5F"/>
-        <path d="M0 10 L-2 14 L0 12 Z" fill="#C9A227"/>
-        <path d="M6 10 L8 14 L6 12 Z" fill="#C9A227"/>
-        <circle cx="3" cy="6" r="1.1" fill="#F6E27A"/>
-      </g>
-    </svg>
+    <img src="assets/logo-hl.jpg" alt="Logo personnel Hélène Laruelle" class="logo-hl-inline">
   </div>
 </footer>
 

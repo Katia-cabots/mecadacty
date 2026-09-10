@@ -6,7 +6,7 @@ import { db } from "./firebase-config.js";
 import { VERSION_SITE } from "./version.js";
 import { afficherBandeau } from "./interface.js";
 import {
-  collection, addDoc, getDocs, doc, setDoc, updateDoc, serverTimestamp
+  collection, addDoc, getDocs, doc, setDoc, updateDoc, deleteDoc, deleteField, query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // ---------- Garde d'accès ----------
@@ -14,23 +14,53 @@ const utilisateurBrut = sessionStorage.getItem("mecadacty_utilisateur");
 if (!utilisateurBrut) {
   window.location.href = "connexion.html";
 }
-const utilisateur = utilisateurBrut ? JSON.parse(utilisateurBrut) : null;
+let utilisateur = utilisateurBrut ? JSON.parse(utilisateurBrut) : null;
 if (utilisateur && utilisateur.role !== "admin") {
   window.location.href = "client.html";
 }
 
 document.getElementById("version-tag").textContent = VERSION_SITE;
 
-if (utilisateur && utilisateur.estSuperAdmin) {
+function appliquerAffichageRole() {
   const badge = document.getElementById("badge-role");
-  badge.textContent = "Super Admin";
-  badge.classList.add("role-superadmin");
-  document.getElementById("onglet-btn-motsdepasse").style.display = "block";
-} else if (utilisateur && utilisateur.role === "admin" && !utilisateur.estSuperAdmin) {
-  // Easter egg discret pour Katia uniquement (comme sur le site des Cabots de Fernelmont)
-  const badge = document.getElementById("badge-role");
-  badge.textContent = "Admin 🍓";
+  const estSuper = utilisateur && utilisateur.estSuperAdmin === true;
+
+  badge.classList.remove("role-superadmin");
+  document.getElementById("onglet-btn-motsdepasse").style.display = "none";
+
+  if (estSuper) {
+    badge.textContent = "Super Admin";
+    badge.classList.add("role-superadmin");
+    document.getElementById("onglet-btn-motsdepasse").style.display = "block";
+  } else {
+    // Easter egg discret pour Katia uniquement (comme sur le site des Cabots de Fernelmont)
+    badge.textContent = "Admin 🍓";
+  }
+
+  const salutation = document.getElementById("salutation-admin");
+  if (salutation && utilisateur) salutation.textContent = `Bonjour, ${utilisateur.prenom}`;
 }
+
+appliquerAffichageRole();
+
+// Rafraîchit les données utilisateur depuis Firestore (évite un affichage
+// erroné du rôle si la session en cache est ancienne ou incomplète)
+async function rafraichirUtilisateur() {
+  if (!utilisateur || !utilisateur.identifiant) return;
+  try {
+    const q = query(collection(db, "utilisateurs"), where("identifiant", "==", utilisateur.identifiant));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const frais = { id: snap.docs[0].id, ...snap.docs[0].data() };
+      utilisateur = frais;
+      sessionStorage.setItem("mecadacty_utilisateur", JSON.stringify(utilisateur));
+      appliquerAffichageRole();
+    }
+  } catch (err) {
+    console.warn("Impossible de rafraîchir les données utilisateur :", err);
+  }
+}
+rafraichirUtilisateur();
 
 document.getElementById("btn-deconnexion").addEventListener("click", () => {
   sessionStorage.removeItem("mecadacty_utilisateur");
@@ -46,6 +76,7 @@ document.querySelectorAll(".app-menu button[data-onglet]").forEach((bouton) => {
     document.getElementById("onglet-" + bouton.dataset.onglet).classList.add("actif");
     if (bouton.dataset.onglet === "messages") marquerMessagesLus();
     if (bouton.dataset.onglet === "motsdepasse") chargerMotsDePasse();
+    if (bouton.dataset.onglet === "messagerie") ouvrirOngletMessagerie();
   });
 });
 
@@ -95,12 +126,12 @@ async function chargerTableauDeBord() {
       getDocs(collection(db, "rdv")),
       getDocs(collection(db, "demandesInscription"))
     ]);
-    const nbClients = clientsSnap.docs.filter(d => d.data().role === "membre").length;
+    const nbClients = clientsSnap.docs.filter(d => d.data().role === "client").length;
     const nbDossiersEnCours = dossiersSnap.docs.filter(d => d.data().statut === "en_cours").length;
     const nbInscriptionsAttente = inscriptionsSnap.docs.filter(d => !d.data().traitee).length;
 
     document.getElementById("resume-tableau").innerHTML = `
-      <p><strong>${nbClients}</strong> membre(s) enregistré(s)</p>
+      <p><strong>${nbClients}</strong> client(s) enregistré(s)</p>
       <p><strong>${nbDossiersEnCours}</strong> dossier(s) en cours</p>
       <p><strong>${rdvSnap.size}</strong> rendez-vous au total</p>
       <p><strong>${nbInscriptionsAttente}</strong> demande(s) d'inscription en attente</p>
@@ -115,7 +146,7 @@ async function chargerTableauDeBord() {
   }
 }
 
-// ---------- Membres (clients) ----------
+// ---------- Clients ----------
 let listeClients = [];
 
 async function chargerClients() {
@@ -124,10 +155,10 @@ async function chargerClients() {
     const snap = await getDocs(collection(db, "utilisateurs"));
     listeClients = snap.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(u => u.role === "membre");
+      .filter(u => u.role === "client");
 
     if (listeClients.length === 0) {
-      corps.innerHTML = `<tr><td colspan="4" class="message-vide">Aucun membre enregistré pour le moment.</td></tr>`;
+      corps.innerHTML = `<tr><td colspan="4" class="message-vide">Aucun client enregistré pour le moment.</td></tr>`;
     } else {
       corps.innerHTML = listeClients.map(c => `
         <tr>
@@ -141,12 +172,14 @@ async function chargerClients() {
 
     const selectDossier = document.getElementById("do-client");
     const selectRdv = document.getElementById("rd-client");
+    const selectHeures = document.getElementById("he-client");
     const options = `<option value="">— Choisir —</option>` + listeClients.map(c => `<option value="${c.id}">${c.prenom} ${c.nom}</option>`).join("");
     selectDossier.innerHTML = options;
     selectRdv.innerHTML = options;
+    selectHeures.innerHTML = options;
   } catch (err) {
     console.error(err);
-    corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des membres. Vérifiez la connexion à Firebase.</td></tr>`;
+    corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des clients. Vérifiez la connexion à Firebase.</td></tr>`;
   }
 }
 
@@ -173,16 +206,16 @@ document.getElementById("btn-ajouter-client").addEventListener("click", async ()
   try {
     await addDoc(collection(db, "utilisateurs"), {
       nom, prenom, gsm, email, identifiant, motDePasse,
-      role: "membre", estSuperAdmin: false, nbDossiers: 0,
+      role: "client", estSuperAdmin: false, nbDossiers: 0,
       dateCreation: serverTimestamp(), derniereConnexion: null
     });
-    afficherBandeau("clients-bandeau", `Membre ajouté. Identifiant : ${identifiant} — Mot de passe : ${motDePasse}`, "succes");
+    afficherBandeau("clients-bandeau", `Client ajouté. Identifiant : ${identifiant} — Mot de passe : ${motDePasse}`, "succes");
     ["cl-nom","cl-prenom","cl-naissance","cl-gsm","cl-email","cl-identifiant","cl-motdepasse"].forEach(id => document.getElementById(id).value = "");
     chargerClients();
     chargerTableauDeBord();
   } catch (err) {
     console.error(err);
-    afficherBandeau("clients-bandeau", "Erreur lors de l'ajout du membre. Vérifiez la connexion à Firebase et réessayez.", "erreur");
+    afficherBandeau("clients-bandeau", "Erreur lors de l'ajout du client. Vérifiez la connexion à Firebase et réessayez.", "erreur");
   }
 });
 
@@ -216,7 +249,7 @@ async function chargerDossiers() {
 document.getElementById("btn-ajouter-dossier").addEventListener("click", async () => {
   const clientId = document.getElementById("do-client").value;
   if (!clientId) {
-    afficherBandeau("dossiers-bandeau", "Merci de choisir un membre.", "erreur");
+    afficherBandeau("dossiers-bandeau", "Merci de choisir un client.", "erreur");
     return;
   }
   try {
@@ -237,29 +270,106 @@ document.getElementById("btn-ajouter-dossier").addEventListener("click", async (
   }
 });
 
+// ---------- Suivi des heures (par client — confidentiel) ----------
+async function chargerHeuresAdmin() {
+  const corps = document.querySelector("#table-heures tbody");
+  try {
+    const snap = await getDocs(collection(db, "heures"));
+    if (snap.empty) {
+      corps.innerHTML = `<tr><td colspan="5" class="message-vide">Aucune heure enregistrée pour le moment.</td></tr>`;
+      return;
+    }
+    const entrees = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    corps.innerHTML = entrees.map(h => {
+      const client = listeClients.find(c => c.id === h.clientId);
+      return `<tr>
+        <td>${client ? client.prenom + " " + client.nom : "—"}</td>
+        <td>${h.date || ""}</td>
+        <td>${h.heures ?? ""}</td>
+        <td>${h.description || ""}</td>
+        <td><button class="bouton-mini-discret btn-suppr-heures" data-id="${h.id}">Supprimer</button></td>
+      </tr>`;
+    }).join("");
+
+    document.querySelectorAll(".btn-suppr-heures").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "heures", bouton.dataset.id));
+          chargerHeuresAdmin();
+        } catch (err) { console.error(err); }
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    corps.innerHTML = `<tr><td colspan="5" class="message-vide">Erreur de chargement des heures.</td></tr>`;
+  }
+}
+
+document.getElementById("btn-ajouter-heures").addEventListener("click", async () => {
+  const clientId = document.getElementById("he-client").value;
+  const date = document.getElementById("he-date").value;
+  const heures = parseFloat(document.getElementById("he-heures").value);
+  if (!clientId || !date || isNaN(heures)) {
+    afficherBandeau("heures-bandeau", "Le client, la date et le nombre d'heures sont obligatoires.", "erreur");
+    return;
+  }
+  try {
+    await addDoc(collection(db, "heures"), {
+      clientId, date, heures,
+      description: document.getElementById("he-description").value,
+      dateCreation: serverTimestamp()
+    });
+    afficherBandeau("heures-bandeau", "Heures enregistrées.", "succes");
+    document.getElementById("he-heures").value = "";
+    document.getElementById("he-description").value = "";
+    chargerHeuresAdmin();
+  } catch (err) {
+    console.error(err);
+    afficherBandeau("heures-bandeau", "Erreur lors de l'enregistrement des heures.", "erreur");
+  }
+});
+
 // ---------- Rendez-vous ----------
 async function chargerRdv() {
   const corps = document.querySelector("#table-rdv tbody");
   try {
     const snap = await getDocs(collection(db, "rdv"));
     if (snap.empty) {
-      corps.innerHTML = `<tr><td colspan="4" class="message-vide">Aucun rendez-vous pour le moment.</td></tr>`;
+      corps.innerHTML = `<tr><td colspan="3" class="message-vide">Aucun rendez-vous pour le moment.</td></tr>`;
       return;
     }
     corps.innerHTML = snap.docs.map(d => {
       const data = d.data();
       const client = listeClients.find(c => c.id === data.clientId);
-      const dateAffichee = data.date ? new Date(data.date).toLocaleString("fr-BE") : "";
+      let colonneCreneaux;
+      if (data.creneauChoisi) {
+        colonneCreneaux = `<span class="statut-pastille statut-termine">Confirmé — ${new Date(data.creneauChoisi).toLocaleString("fr-BE")}</span>`;
+      } else if (data.creneauxProposes && data.creneauxProposes.length) {
+        colonneCreneaux = data.creneauxProposes.map(c => `
+          <button class="bouton-mini-discret btn-valider-creneau" data-id="${d.id}" data-creneau="${c}">
+            Valider : ${new Date(c).toLocaleString("fr-BE")}
+          </button>`).join("<br>");
+      } else {
+        colonneCreneaux = data.date ? new Date(data.date).toLocaleString("fr-BE") : "—";
+      }
       return `<tr>
         <td>${client ? client.prenom + " " + client.nom : "—"}</td>
-        <td>${dateAffichee}</td>
         <td>${data.objet || ""}</td>
-        <td>${data.confirme ? "Oui" : "En attente"}</td>
+        <td>${colonneCreneaux}</td>
       </tr>`;
     }).join("");
+
+    document.querySelectorAll(".btn-valider-creneau").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await updateDoc(doc(db, "rdv", bouton.dataset.id), { creneauChoisi: bouton.dataset.creneau, confirme: true });
+          chargerRdv();
+        } catch (err) { console.error(err); }
+      });
+    });
   } catch (err) {
     console.error(err);
-    corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des rendez-vous.</td></tr>`;
+    corps.innerHTML = `<tr><td colspan="3" class="message-vide">Erreur de chargement des rendez-vous.</td></tr>`;
   }
 }
 
@@ -267,17 +377,19 @@ document.getElementById("btn-ajouter-rdv").addEventListener("click", async () =>
   const clientId = document.getElementById("rd-client").value;
   const date = document.getElementById("rd-date").value;
   if (!clientId || !date) {
-    afficherBandeau("rdv-bandeau", "Le membre et la date sont obligatoires.", "erreur");
+    afficherBandeau("rdv-bandeau", "Le client et la date sont obligatoires.", "erreur");
     return;
   }
   try {
     await addDoc(collection(db, "rdv"), {
-      clientId, date,
+      clientId,
+      creneauxProposes: [date],
+      creneauChoisi: date,
       objet: document.getElementById("rd-objet").value,
-      confirme: false,
+      confirme: true,
       dateCreation: serverTimestamp()
     });
-    afficherBandeau("rdv-bandeau", "Rendez-vous créé.", "succes");
+    afficherBandeau("rdv-bandeau", "Rendez-vous créé et confirmé.", "succes");
     document.getElementById("rd-objet").value = "";
     chargerRdv();
     chargerTableauDeBord();
@@ -365,7 +477,8 @@ function marquerMessagesLus() {
 
 // ---------- Contenu du site ----------
 const clesContenu = [
-  ["slogan_site", "Slogan (en-tête des pages, au-dessus du titre sur l'accueil)"],
+  ["slogan_site", "Slogan (bloc à côté du logo, page d'accueil)"],
+  ["accueil_eyebrow", "Accueil — Texte au-dessus du titre (héros)"],
   ["accueil_titre", "Accueil — Titre principal"],
   ["accueil_chapo", "Accueil — Texte sous le titre"],
   ["accueil_services_titre", "Accueil — Titre section services"],
@@ -373,10 +486,20 @@ const clesContenu = [
   ["accueil_espace_texte", "Accueil — Texte section espace client"],
   ["services_titre", "Services — Titre"],
   ["services_chapo", "Services — Texte d'introduction"],
+  ["service1_titre", "Service 1 — Titre"], ["service1_texte", "Service 1 — Texte"],
+  ["service2_titre", "Service 2 — Titre"], ["service2_texte", "Service 2 — Texte"],
+  ["service3_titre", "Service 3 — Titre"], ["service3_texte", "Service 3 — Texte"],
+  ["service4_titre", "Service 4 — Titre"], ["service4_texte", "Service 4 — Texte"],
+  ["service5_titre", "Service 5 — Titre"], ["service5_texte", "Service 5 — Texte"],
+  ["service6_titre", "Service 6 — Titre"], ["service6_texte", "Service 6 — Texte"],
+  ["service7_titre", "Service 7 — Titre"], ["service7_texte", "Service 7 — Texte"],
+  ["service8_titre", "Service 8 — Titre"], ["service8_texte", "Service 8 — Texte"],
+  ["service9_titre", "Service 9 — Titre"], ["service9_texte", "Service 9 — Texte"],
   ["apropos_titre", "À propos — Titre"],
   ["apropos_katia_titre", "À propos — Nom (présentation)"],
   ["apropos_katia_texte1", "À propos — Présentation, paragraphe 1"],
   ["apropos_katia_texte2", "À propos — Présentation, paragraphe 2"],
+  ["apropos_katia_texte3", "À propos — Présentation, paragraphe 3"],
   ["apropos_texte1", "À propos — Paragraphe 1 (Mecadacty)"],
   ["apropos_texte2", "À propos — Paragraphe 2 (Mecadacty)"],
   ["contact_titre", "Contact — Titre"],
@@ -390,7 +513,18 @@ const clesContenu = [
   ["identite_email", "Mentions légales — E-mail"],
   ["identite_adresse", "Mentions légales — Adresse"],
   ["identite_tva", "Mentions légales — Numéro de TVA"],
-  ["mentions_texte", "Mentions légales — Texte principal"],
+  ["rgpd_intro", "RGPD — Texte d'introduction"],
+  ["cgv_intro", "CGV — Texte d'introduction"],
+  ["cookies_intro", "Cookies — Texte d'introduction"],
+  ["temoignages_titre", "Accueil — Titre section témoignages"],
+  ["temoignage1_texte", "Témoignage 1 — Citation"],
+  ["temoignage1_auteur", "Témoignage 1 — Auteur"],
+  ["temoignage2_texte", "Témoignage 2 — Citation"],
+  ["temoignage2_auteur", "Témoignage 2 — Auteur"],
+  ["temoignage3_texte", "Témoignage 3 — Citation"],
+  ["temoignage3_auteur", "Témoignage 3 — Auteur"],
+  ["actualites_titre", "Actualités — Titre"],
+  ["actualites_chapo", "Actualités — Texte d'introduction"],
 ];
 
 async function chargerContenuAdmin() {
@@ -425,9 +559,189 @@ document.getElementById("btn-enregistrer-contenu").addEventListener("click", asy
   }
 });
 
+// ---------- Actualités / conseils ----------
+async function chargerArticles() {
+  const corps = document.querySelector("#table-articles tbody");
+  try {
+    const snap = await getDocs(collection(db, "articles"));
+    if (snap.empty) {
+      corps.innerHTML = `<tr><td colspan="4" class="message-vide">Aucun article pour le moment.</td></tr>`;
+      return;
+    }
+    const articles = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    corps.innerHTML = articles.map(a => `
+      <tr>
+        <td>${a.date || ""}</td>
+        <td>${a.titre}</td>
+        <td>${a.visible ? "Oui" : "Non"}</td>
+        <td>
+          <button class="bouton-mini-discret btn-toggle-article" data-id="${a.id}" data-visible="${a.visible}">${a.visible ? "Masquer" : "Publier"}</button>
+          <button class="bouton-mini-discret btn-suppr-article" data-id="${a.id}">Supprimer</button>
+        </td>
+      </tr>
+    `).join("");
+
+    document.querySelectorAll(".btn-toggle-article").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await updateDoc(doc(db, "articles", bouton.dataset.id), { visible: bouton.dataset.visible !== "true" });
+          chargerArticles();
+        } catch (err) { console.error(err); }
+      });
+    });
+    document.querySelectorAll(".btn-suppr-article").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "articles", bouton.dataset.id));
+          chargerArticles();
+        } catch (err) { console.error(err); }
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des articles.</td></tr>`;
+  }
+}
+
+document.getElementById("btn-ajouter-article").addEventListener("click", async () => {
+  const titre = document.getElementById("ar-titre").value.trim();
+  const contenu = document.getElementById("ar-contenu").value.trim();
+  const date = document.getElementById("ar-date").value;
+  if (!titre || !contenu) {
+    afficherBandeau("articles-bandeau", "Le titre et le contenu sont obligatoires.", "erreur");
+    return;
+  }
+  try {
+    await addDoc(collection(db, "articles"), {
+      titre, contenu, date, visible: true, dateCreation: serverTimestamp()
+    });
+    afficherBandeau("articles-bandeau", "Article publié.", "succes");
+    document.getElementById("ar-titre").value = "";
+    document.getElementById("ar-contenu").value = "";
+    document.getElementById("ar-date").value = "";
+    chargerArticles();
+  } catch (err) {
+    console.error(err);
+    afficherBandeau("articles-bandeau", "Erreur lors de la publication de l'article.", "erreur");
+  }
+});
+
+// ---------- Messagerie (fil 1-à-1 avec chaque client) ----------
+// Boîte partagée entre Katia (Admin) et Hélène (Super Admin) : les
+// réponses apparaissent toujours comme venant de "Mecadacty", sans
+// distinguer quel compte a répondu (HeleneL reste un accès invisible).
+let clientMessagerieOuvert = null;
+
+function ouvrirOngletMessagerie() {
+  const select = document.getElementById("msg-client");
+  select.innerHTML = `<option value="">— Choisir un client —</option>` +
+    listeClients.map(c => `<option value="${c.id}">${c.prenom} ${c.nom}</option>`).join("");
+}
+
+document.getElementById("msg-client").addEventListener("change", (e) => {
+  clientMessagerieOuvert = e.target.value || null;
+  chargerFilMessages();
+});
+
+async function chargerFilMessages() {
+  const conteneur = document.getElementById("fil-messages");
+  if (!clientMessagerieOuvert) {
+    conteneur.innerHTML = `<p class="message-vide">Choisissez un client pour voir la conversation.</p>`;
+    return;
+  }
+  try {
+    const q = query(collection(db, "messages"), where("clientId", "==", clientMessagerieOuvert));
+    const snap = await getDocs(q);
+    const messages = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (a.dateEnvoi && a.dateEnvoi.toMillis ? a.dateEnvoi.toMillis() : 0) - (b.dateEnvoi && b.dateEnvoi.toMillis ? b.dateEnvoi.toMillis() : 0));
+
+    if (messages.length === 0) {
+      conteneur.innerHTML = `<p class="message-vide">Aucun message avec ce client pour le moment.</p>`;
+    } else {
+      conteneur.innerHTML = messages.map(m => {
+        const heure = m.dateEnvoi && m.dateEnvoi.toDate ? m.dateEnvoi.toDate().toLocaleString("fr-BE") : "";
+        const classe = m.expediteur === "admin" ? "bulle-admin" : "bulle-client";
+        return `<div class="bulle-message ${classe}">
+          ${m.texte}
+          <span class="heure-message">${heure} <button class="btn-suppr-message" data-id="${m.id}">Supprimer</button></span>
+        </div>`;
+      }).join("");
+      conteneur.scrollTop = conteneur.scrollHeight;
+    }
+
+    // Marquer comme lus les messages envoyés par le client
+    messages.filter(m => m.expediteur === "client" && !m.lu).forEach(m => {
+      updateDoc(doc(db, "messages", m.id), { lu: true }).catch(console.error);
+    });
+    document.getElementById("notif-messagerie").style.display = "none";
+
+    document.querySelectorAll(".btn-suppr-message").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "messages", bouton.dataset.id));
+          chargerFilMessages();
+        } catch (err) { console.error(err); }
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    conteneur.innerHTML = `<p class="message-vide">Erreur de chargement de la conversation.</p>`;
+  }
+}
+
+document.getElementById("btn-envoyer-message").addEventListener("click", async () => {
+  const texte = document.getElementById("msg-texte").value.trim();
+  if (!clientMessagerieOuvert || !texte) {
+    afficherBandeau("messagerie-bandeau", "Choisissez un client et écrivez un message avant d'envoyer.", "erreur");
+    return;
+  }
+  try {
+    await addDoc(collection(db, "messages"), {
+      clientId: clientMessagerieOuvert,
+      expediteur: "admin",
+      texte,
+      lu: false,
+      dateEnvoi: serverTimestamp()
+    });
+    document.getElementById("msg-texte").value = "";
+    chargerFilMessages();
+  } catch (err) {
+    console.error(err);
+    afficherBandeau("messagerie-bandeau", "Erreur lors de l'envoi du message.", "erreur");
+  }
+});
+
+async function verifierNotifMessagerie() {
+  try {
+    const q = query(collection(db, "messages"), where("expediteur", "==", "client"), where("lu", "==", false));
+    const snap = await getDocs(q);
+    if (!snap.empty) document.getElementById("notif-messagerie").style.display = "inline-block";
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+// ---------- Réinitialiser le contenu du site par défaut ----------
+document.getElementById("btn-reinit-contenu").addEventListener("click", async () => {
+  const confirmation = window.confirm("Réinitialiser tous les textes du site à leur valeur par défaut ? Cette action est irréversible.");
+  if (!confirmation) return;
+  try {
+    const valeursVides = {};
+    clesContenu.forEach(([cle]) => { valeursVides[cle] = deleteField(); });
+    await updateDoc(doc(db, "contenu", "site"), valeursVides);
+    afficherBandeau("contenu-bandeau", "Contenu réinitialisé aux valeurs par défaut.", "succes");
+    chargerContenuAdmin();
+  } catch (err) {
+    console.error(err);
+    // Si le document n'existe pas encore, il n'y a simplement rien à réinitialiser
+    afficherBandeau("contenu-bandeau", "Contenu déjà par défaut (ou erreur de connexion).", "info");
+  }
+});
+
 // ---------- Mots de passe (Super Admin uniquement) ----------
 async function chargerMotsDePasse() {
-  if (!utilisateur || !utilisateur.estSuperAdmin) return;
+  if (!utilisateur || utilisateur.estSuperAdmin !== true) return;
   const corps = document.querySelector("#table-motsdepasse tbody");
   try {
     const snap = await getDocs(collection(db, "utilisateurs"));
@@ -441,7 +755,7 @@ async function chargerMotsDePasse() {
         <td>${data.prenom} ${data.nom}</td>
         <td>${data.identifiant}</td>
         <td>${data.motDePasse}</td>
-        <td>${data.estSuperAdmin ? "Super Admin" : (data.role === "admin" ? "Admin" : "Membre")}</td>
+        <td>${data.estSuperAdmin ? "Super Admin" : (data.role === "admin" ? "Admin" : "Client")}</td>
         <td>${formaterDate(data.derniereConnexion)}</td>
         <td><button class="bouton-mini-discret btn-reinit" data-id="${d.id}" data-prenom="${data.prenom}" data-nom="${data.nom}">Réinitialiser</button></td>
       </tr>`;
@@ -473,9 +787,12 @@ async function chargerMotsDePasse() {
   await Promise.all([
     chargerTableauDeBord(),
     chargerDossiers(),
+    chargerHeuresAdmin(),
     chargerRdv(),
     chargerInscriptions(),
     chargerMessages(),
-    chargerContenuAdmin()
+    chargerContenuAdmin(),
+    chargerArticles(),
+    verifierNotifMessagerie()
   ]);
 })();

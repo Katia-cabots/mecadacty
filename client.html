@@ -13,7 +13,7 @@
     <a href="index.html" class="icone-maison" title="Accueil du site">🏠</a>
     <div class="app-entete-titre-bloc">
       <div class="titre-site">Mecadacty</div>
-      <span class="badge-role role-membre">Membre</span>
+      <span class="badge-role role-client">Client</span>
       <span class="version-tag" id="version-tag"></span>
     </div>
   </div>
@@ -24,7 +24,9 @@
   <nav class="app-menu">
     <button data-onglet="accueil" class="actif">Mon espace</button>
     <button data-onglet="dossiers">Mes dossiers</button>
+    <button data-onglet="heures">Mes heures</button>
     <button data-onglet="rdv">Mes rendez-vous</button>
+    <button data-onglet="messagerie">Message à Katia <span class="point-notif" id="notif-messagerie-client" style="display:none;"></span></button>
   </nav>
 
   <main class="app-contenu">
@@ -46,13 +48,33 @@
       </div>
     </section>
 
+    <section class="app-onglet" id="onglet-heures">
+      <h2>Mes heures</h2>
+      <div class="carte">
+        <table class="tableau-donnees" id="table-mes-heures">
+          <thead><tr><th>Date</th><th>Heures</th><th>Description</th></tr></thead>
+          <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+        <p id="total-mes-heures" style="margin-top:12px; font-weight:600; color:var(--bleu-profond);"></p>
+      </div>
+    </section>
+
     <section class="app-onglet" id="onglet-rdv">
       <h2>Mes rendez-vous</h2>
       <div class="carte">
         <h3>Demander un rendez-vous</h3>
+        <p class="champ-aide" style="margin-bottom:14px;">Proposez 3 créneaux — Katia validera celui qui lui convient.</p>
         <div class="champ">
-          <label>Date souhaitée</label>
-          <input type="datetime-local" id="rd-date-client">
+          <label>Créneau souhaité 1</label>
+          <input type="datetime-local" id="rd-date1-client">
+        </div>
+        <div class="champ">
+          <label>Créneau souhaité 2</label>
+          <input type="datetime-local" id="rd-date2-client">
+        </div>
+        <div class="champ">
+          <label>Créneau souhaité 3</label>
+          <input type="datetime-local" id="rd-date3-client">
         </div>
         <div class="champ">
           <label>Objet</label>
@@ -64,9 +86,23 @@
       <div class="carte">
         <h3>Historique</h3>
         <table class="tableau-donnees" id="table-mes-rdv">
-          <thead><tr><th>Date</th><th>Objet</th><th>Statut</th></tr></thead>
+          <thead><tr><th>Créneaux proposés</th><th>Objet</th><th>Statut</th></tr></thead>
           <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-messagerie">
+      <h2>Message à Katia</h2>
+      <div class="carte">
+        <div class="fil-messages" id="fil-messages-client">
+          <p class="message-vide">Chargement...</p>
+        </div>
+        <div class="zone-envoi-message">
+          <input type="text" id="msg-texte-client" placeholder="Écrire un message...">
+          <button id="btn-envoyer-message-client" class="bouton-primaire" style="border:none; cursor:pointer;">Envoyer</button>
+        </div>
+        <div id="messagerie-client-bandeau" class="bandeau"></div>
       </div>
     </section>
 

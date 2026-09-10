@@ -23,19 +23,22 @@
 <div class="app-layout">
   <nav class="app-menu">
     <button data-onglet="tableau" class="actif">Tableau de bord</button>
-    <button data-onglet="clients">Membres <span class="point-notif" id="notif-clients" style="display:none;"></span></button>
+    <button data-onglet="clients">Clients <span class="point-notif" id="notif-clients" style="display:none;"></span></button>
     <button data-onglet="dossiers">Dossiers</button>
+    <button data-onglet="heures">Suivi des heures</button>
     <button data-onglet="rdv">Rendez-vous</button>
     <button data-onglet="inscriptions">Demandes d'inscription <span class="point-notif" id="notif-inscriptions" style="display:none;"></span></button>
     <button data-onglet="messages">Messages <span class="point-notif" id="notif-messages" style="display:none;"></span></button>
+    <button data-onglet="messagerie">Messagerie <span class="point-notif" id="notif-messagerie" style="display:none;"></span></button>
     <button data-onglet="contenu">Contenu du site</button>
+    <button data-onglet="articles">Actualités</button>
     <button data-onglet="motsdepasse" id="onglet-btn-motsdepasse" style="display:none;">Mots de passe</button>
   </nav>
 
   <main class="app-contenu">
 
     <section class="app-onglet actif" id="onglet-tableau">
-      <h2>Tableau de bord</h2>
+      <h2 id="salutation-admin">Bonjour</h2>
       <div id="tableau-bandeau" class="bandeau"></div>
       <div class="carte" id="resume-tableau">
         <p class="message-vide">Chargement...</p>
@@ -44,12 +47,12 @@
 
     <section class="app-onglet" id="onglet-clients">
       <div class="entete-onglet">
-        <h2 style="margin:0;">Membres</h2>
-        <button id="btn-toggle-form-client" class="bouton-mini">+ Ajouter un membre</button>
+        <h2 style="margin:0;">Clients</h2>
+        <button id="btn-toggle-form-client" class="bouton-mini">+ Ajouter un client</button>
       </div>
 
       <div class="carte" id="carte-form-client" style="display:none;">
-        <h3>Nouveau membre</h3>
+        <h3>Nouveau client</h3>
         <div class="champ">
           <label>Nom</label>
           <input type="text" id="cl-nom">
@@ -83,12 +86,12 @@
           <p class="champ-aide">Lettres, chiffres, points et tirets uniquement — pas de caractères spéciaux.</p>
         </div>
         <button id="btn-suggerer" class="bouton-secondaire" style="border:1.5px solid var(--bleu-profond); color:var(--bleu-profond); cursor:pointer;">Suggérer identifiant / mot de passe</button>
-        <button id="btn-ajouter-client" class="bouton-primaire" style="border:none; cursor:pointer; margin-left:8px;">Enregistrer le membre</button>
+        <button id="btn-ajouter-client" class="bouton-primaire" style="border:none; cursor:pointer; margin-left:8px;">Enregistrer le client</button>
         <div id="clients-bandeau" class="bandeau"></div>
       </div>
 
       <div class="carte">
-        <h3>Liste des membres</h3>
+        <h3>Liste des clients</h3>
         <table class="tableau-donnees" id="table-clients">
           <thead><tr><th>Nom</th><th>Contact</th><th>Identifiant</th><th>Dernière connexion</th></tr></thead>
           <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
@@ -101,7 +104,7 @@
       <div class="carte">
         <h3>Nouveau dossier</h3>
         <div class="champ">
-          <label>Membre</label>
+          <label>Client</label>
           <select id="do-client"><option value="">— Choisir —</option></select>
         </div>
         <div class="champ">
@@ -129,8 +132,40 @@
       <div class="carte">
         <h3>Tous les dossiers</h3>
         <table class="tableau-donnees" id="table-dossiers">
-          <thead><tr><th>Membre</th><th>Type</th><th>Description</th><th>Statut</th></tr></thead>
+          <thead><tr><th>Client</th><th>Type</th><th>Description</th><th>Statut</th></tr></thead>
           <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-heures">
+      <h2>Suivi des heures — par client</h2>
+      <div class="carte">
+        <h3>Ajouter des heures</h3>
+        <div class="champ">
+          <label>Client</label>
+          <select id="he-client"><option value="">— Choisir —</option></select>
+        </div>
+        <div class="champ">
+          <label>Date</label>
+          <input type="date" id="he-date">
+        </div>
+        <div class="champ">
+          <label>Heures prestées</label>
+          <input type="number" id="he-heures" step="0.25" min="0">
+        </div>
+        <div class="champ">
+          <label>Description</label>
+          <input type="text" id="he-description">
+        </div>
+        <button id="btn-ajouter-heures" class="bouton-primaire" style="border:none; cursor:pointer;">Enregistrer</button>
+        <div id="heures-bandeau" class="bandeau"></div>
+      </div>
+      <div class="carte">
+        <h3>Historique (tous clients)</h3>
+        <table class="tableau-donnees" id="table-heures">
+          <thead><tr><th>Client</th><th>Date</th><th>Heures</th><th>Description</th><th></th></tr></thead>
+          <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -138,9 +173,9 @@
     <section class="app-onglet" id="onglet-rdv">
       <h2>Rendez-vous</h2>
       <div class="carte">
-        <h3>Nouveau rendez-vous</h3>
+        <h3>Créer directement un rendez-vous confirmé</h3>
         <div class="champ">
-          <label>Membre</label>
+          <label>Client</label>
           <select id="rd-client"><option value="">— Choisir —</option></select>
         </div>
         <div class="champ">
@@ -157,8 +192,8 @@
       <div class="carte">
         <h3>Tous les rendez-vous</h3>
         <table class="tableau-donnees" id="table-rdv">
-          <thead><tr><th>Membre</th><th>Date</th><th>Objet</th><th>Confirmé</th></tr></thead>
-          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+          <thead><tr><th>Client</th><th>Objet</th><th>Créneaux / Validation</th></tr></thead>
+          <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -183,6 +218,24 @@
       </div>
     </section>
 
+    <section class="app-onglet" id="onglet-messagerie">
+      <h2>Messagerie</h2>
+      <div class="carte">
+        <div class="champ">
+          <label>Client</label>
+          <select id="msg-client"><option value="">— Choisir un client —</option></select>
+        </div>
+        <div class="fil-messages" id="fil-messages">
+          <p class="message-vide">Choisissez un client pour voir la conversation.</p>
+        </div>
+        <div class="zone-envoi-message">
+          <input type="text" id="msg-texte" placeholder="Écrire un message...">
+          <button id="btn-envoyer-message" class="bouton-primaire" style="border:none; cursor:pointer;">Envoyer</button>
+        </div>
+        <div id="messagerie-bandeau" class="bandeau"></div>
+      </div>
+    </section>
+
     <section class="app-onglet" id="onglet-contenu">
       <h2>Contenu du site</h2>
       <p style="color:var(--texte-doux); font-size:0.9rem;">Modifiez ici les textes affichés sur les pages publiques du site. Laissez un champ vide pour garder le texte par défaut.</p>
@@ -190,7 +243,38 @@
         <p class="message-vide">Chargement...</p>
       </div>
       <button id="btn-enregistrer-contenu" class="bouton-primaire" style="border:none; cursor:pointer;">Enregistrer le contenu</button>
+      <button id="btn-reinit-contenu" class="bouton-mini-discret" style="margin-left:10px;">Réinitialiser le contenu par défaut</button>
       <div id="contenu-bandeau" class="bandeau"></div>
+    </section>
+
+    <section class="app-onglet" id="onglet-articles">
+      <div class="entete-onglet">
+        <h2 style="margin:0;">Actualités &amp; conseils</h2>
+      </div>
+      <div class="carte">
+        <h3>Nouvel article</h3>
+        <div class="champ">
+          <label>Titre</label>
+          <input type="text" id="ar-titre">
+        </div>
+        <div class="champ">
+          <label>Date (affichée)</label>
+          <input type="date" id="ar-date">
+        </div>
+        <div class="champ">
+          <label>Contenu</label>
+          <textarea id="ar-contenu" rows="5"></textarea>
+        </div>
+        <button id="btn-ajouter-article" class="bouton-primaire" style="border:none; cursor:pointer;">Publier l'article</button>
+        <div id="articles-bandeau" class="bandeau"></div>
+      </div>
+      <div class="carte">
+        <h3>Articles publiés</h3>
+        <table class="tableau-donnees" id="table-articles">
+          <thead><tr><th>Date</th><th>Titre</th><th>Visible</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
     </section>
 
     <section class="app-onglet" id="onglet-motsdepasse">

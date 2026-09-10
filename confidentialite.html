@@ -17,6 +17,7 @@
     <nav class="entete-nav">
       <a href="index.html">Accueil</a>
       <a href="services.html">Services</a>
+      <a href="actualites.html">Actualités</a>
       <a href="apropos.html">À propos</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -25,8 +26,38 @@
 
 <section class="section section-alt">
   <div class="container">
-    <h1>Déclaration de confidentialité</h1>
-    <p style="color:var(--texte-doux);">Cette page sera complétée avec le contenu définitif relatif à : déclaration de confidentialité.</p>
+    <h1>RGPD — Déclaration de confidentialité</h1>
+    <p style="color:var(--texte-doux);" data-contenu="rgpd_intro">Cette page explique quelles données sont collectées sur le site Mecadacty, pourquoi, et comment elles sont protégées.</p>
+
+    <h3 style="margin-top:26px;">Responsable du traitement</h3>
+    <div class="carte-identite">
+      <div class="carte-identite-logo">
+        <img src="assets/logo-mecadacty.jpg" alt="Mecadacty">
+      </div>
+      <div class="carte-identite-infos">
+        <h3 data-contenu="identite_nom">Mecadacty</h3>
+        <p class="carte-identite-societe" data-contenu="identite_societe">LES BEAUX CABOTS SRL</p>
+        <div class="carte-identite-ligne"><span class="etiquette">Tél.</span><span data-contenu="identite_tel">0032 494 05 17 96</span></div>
+        <div class="carte-identite-ligne"><span class="etiquette">Email</span><span data-contenu="identite_email">cabotsdefernelmont@gmail.com</span></div>
+        <div class="carte-identite-ligne"><span class="etiquette">Adresse</span><span data-contenu="identite_adresse">Rue Grande 26, 4219 Wasseiges (Meeffe)</span></div>
+        <div class="carte-identite-ligne"><span class="etiquette">TVA</span><span data-contenu="identite_tva">BE 0729.593.814</span></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px;">Données collectées</h3>
+    <p>Selon votre usage du site, Mecadacty peut collecter : nom, prénom, e-mail et numéro de GSM (formulaire de contact, création d'un espace client), le contenu des messages échangés via la messagerie de l'espace client, ainsi que les informations liées à vos dossiers et rendez-vous.</p>
+
+    <h3 style="margin-top:22px;">Finalité</h3>
+    <p>Ces données sont utilisées uniquement pour répondre à vos demandes, gérer votre espace client, assurer le suivi de vos dossiers et rendez-vous, et vous recontacter si nécessaire. Elles ne sont jamais vendues ni transmises à des tiers à des fins commerciales.</p>
+
+    <h3 style="margin-top:22px;">Conservation</h3>
+    <p>Vos données sont conservées le temps nécessaire à la gestion de votre relation avec Mecadacty. Vous pouvez demander leur suppression à tout moment par e-mail ou via le formulaire de contact.</p>
+
+    <h3 style="margin-top:22px;">Sécurisation</h3>
+    <p>L'accès aux espaces Admin et Client nécessite une connexion par identifiant et mot de passe. Les mots de passe ne sont jamais affichés en clair par défaut sur le site (une icône permet de les révéler à la demande). Le site n'utilise aucun cookie de suivi publicitaire.</p>
+
+    <h3 style="margin-top:22px;">Vos droits</h3>
+    <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données. Pour l'exercer, contactez Mecadacty via la page <a href="contact.html">Contact</a> ou par e-mail à <span data-contenu="identite_email">cabotsdefernelmont@gmail.com</span>.</p>
   </div>
 </section>
 
@@ -37,31 +68,13 @@
       Contenu sous la responsabilité de Katia Renard
     </div>
     <div class="pied-liens">
-      <a href="securisation.html">Sécurisation</a> |
-      <a href="confidentialite.html">Déclaration de confidentialité</a> |
-      <a href="ethique.html">Business Ethics &amp; Governance</a> |
-      <a href="cookies.html">Politique en matière de cookies</a> |
-      <a href="responsabilite.html">Limitation de responsabilité</a> |
-      <a href="mentions.html">Mentions légales / RGPD / CGV</a>
+      <a href="cookies.html">Cookies</a> |
+      <a href="confidentialite.html">RGPD</a> |
+      <a href="cgv.html">CGV</a>
     </div>
     <div class="pied-tva">TVA <span data-contenu="identite_tva">BE 0729.593.814</span></div>
     <div class="pied-version" id="pied-version"></div>
-    <svg class="logo-hl-inline" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo personnel Helene Laruelle">
-      <defs>
-        <radialGradient id="degradeOrHL_confidentialite" cx="35%" cy="30%" r="75%">
-          <stop offset="0%" stop-color="#F6E27A"/>
-          <stop offset="100%" stop-color="#C9A227"/>
-        </radialGradient>
-      </defs>
-      <circle cx="28" cy="30" r="26" fill="url(#degradeOrHL_confidentialite)" stroke="#1F3A5F" stroke-width="1"/>
-      <text x="28" y="38" font-family="Source Serif 4, Georgia, serif" font-style="italic" font-weight="700" font-size="22" fill="#1F3A5F" text-anchor="middle">HL</text>
-      <g transform="translate(44,4) rotate(45)">
-        <path d="M0 10 L3 0 L6 10 Z" fill="#1F3A5F"/>
-        <path d="M0 10 L-2 14 L0 12 Z" fill="#C9A227"/>
-        <path d="M6 10 L8 14 L6 12 Z" fill="#C9A227"/>
-        <circle cx="3" cy="6" r="1.1" fill="#F6E27A"/>
-      </g>
-    </svg>
+    <img src="assets/logo-hl.jpg" alt="Logo personnel Hélène Laruelle" class="logo-hl-inline">
   </div>
 </footer>
 

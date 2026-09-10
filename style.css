@@ -99,6 +99,26 @@ a { color: var(--bleu-moyen); }
   .entete-marque img.logo-site-accueil { height: 52px; }
 }
 
+.entete-marque-bloc {
+  background: var(--fond);
+  border-radius: var(--rayon);
+  padding: 8px 16px;
+}
+
+.slogan-bloc {
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--texte-doux);
+  border-left: 2px solid var(--or);
+  padding-left: 12px;
+  max-width: 170px;
+}
+
+@media (max-width: 560px) {
+  .slogan-bloc { display: none; }
+}
+
 .entete-marque-soustitre {
   font-size: 0.74rem;
   color: var(--texte-doux);
@@ -344,6 +364,13 @@ nav.entete-nav a.actif {
 
 .bloc-presentation .presentation-texte { flex: 1; min-width: 260px; }
 
+.bloc-presentation img.portrait.logo-presentation {
+  border-radius: var(--rayon);
+  object-fit: contain;
+  background: var(--blanc);
+  padding: 14px;
+}
+
 .liste-atouts {
   list-style: none;
   padding: 0;
@@ -366,6 +393,68 @@ nav.entete-nav a.actif {
 @media (max-width: 560px) {
   .bloc-presentation { flex-direction: column; align-items: center; text-align: center; }
 }
+
+/* ---------- Témoignages ---------- */
+.grille-temoignages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.carte-temoignage {
+  background: var(--blanc);
+  border: 1px solid var(--gris-clair);
+  border-radius: var(--rayon);
+  padding: 24px;
+  position: relative;
+}
+
+.carte-temoignage .guillemet {
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  color: var(--or);
+  line-height: 1;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.carte-temoignage p.citation {
+  font-style: italic;
+  color: var(--texte);
+  font-size: 0.95rem;
+  margin: 0 0 14px 0;
+}
+
+.carte-temoignage p.auteur {
+  color: var(--gris-ardoise);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* ---------- Actualités / conseils ---------- */
+.liste-articles { margin-top: 28px; }
+
+.carte-article {
+  background: var(--blanc);
+  border: 1px solid var(--gris-clair);
+  border-left: 3px solid var(--bleu-moyen);
+  border-radius: var(--rayon);
+  padding: 22px 26px;
+  margin-bottom: 18px;
+}
+
+.carte-article .date-article {
+  color: var(--gris-ardoise);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+}
+
+.carte-article h3 { margin-bottom: 8px; }
+.carte-article .contenu-article { color: var(--texte); font-size: 0.95rem; white-space: pre-line; }
 
 /* ---------- Carte d'identité légale (société) ---------- */
 .carte-identite {
@@ -480,16 +569,97 @@ footer.pied a { color: #C8D4DE; }
 .pied-tva { color: #9FB1BF; white-space: nowrap; }
 .pied-version { color: #9FB1BF; white-space: nowrap; font-size: 0.8rem; }
 
-/* Badge personnel HL — SVG, dans le pied de page des pages PUBLIQUES uniquement */
+/* Badge personnel HL — image réelle, dans le pied de page des pages PUBLIQUES uniquement */
 .logo-hl-inline {
   width: 40px;
   height: 40px;
   flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 @media (max-width: 700px) {
   .pied-barre { flex-direction: column; align-items: flex-start; }
 }
+
+/* ---------- Messagerie (fil de discussion admin / client) ---------- */
+.fil-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 6px 2px;
+  margin-bottom: 14px;
+}
+
+.bulle-message {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.bulle-client {
+  align-self: flex-start;
+  background: var(--fond);
+  border: 1px solid var(--gris-clair);
+  border-bottom-left-radius: 2px;
+}
+
+.bulle-admin {
+  align-self: flex-end;
+  background: var(--bleu-profond);
+  color: var(--blanc);
+  border-bottom-right-radius: 2px;
+}
+
+.bulle-message .heure-message {
+  display: block;
+  font-size: 0.68rem;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.bulle-message .btn-suppr-message {
+  background: none;
+  border: none;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0;
+  margin-left: 8px;
+  text-decoration: underline;
+}
+
+.zone-envoi-message {
+  display: flex;
+  gap: 10px;
+}
+.zone-envoi-message input { flex: 1; }
+
+/* ---------- Bouton retour accueil (fixe, haut droite, tout le site) ---------- */
+#bouton-accueil-global {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 60;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bleu-profond);
+  color: var(--blanc);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+/* ---------- Bouton de réinitialisation du contenu ---------- */
 
 /* ---------- Espaces Admin / Super Admin / Membre ---------- */
 .app-entete {
@@ -525,7 +695,7 @@ footer.pied a { color: #C8D4DE; }
   font-weight: 700;
 }
 .app-entete-titre-bloc .badge-role.role-superadmin { background: #F0D98C; }
-.app-entete-titre-bloc .badge-role.role-membre { background: var(--gris-clair); color: var(--bleu-profond); }
+.app-entete-titre-bloc .badge-role.role-client { background: var(--gris-clair); color: var(--bleu-profond); }
 .app-entete-titre-bloc .version-tag {
   font-size: 0.68rem;
   color: #A9BBC8;
