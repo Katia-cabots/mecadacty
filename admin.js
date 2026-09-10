@@ -39,7 +39,18 @@ function appliquerAffichageRole() {
     document.getElementById("onglet-btn-motsdepasse").style.display = "block";
   } else {
     // Easter egg discret pour Katia uniquement (comme sur le site des Cabots de Fernelmont)
-    badge.innerHTML = `Admin <svg width="12" height="12" viewBox="0 0 24 24" style="vertical-align:-1px;"><path fill="#000000" d="M12 8c-1-2-3-3-5-2 1-1 3-1 4 0-2-2-5-2-6 0 3-1 5 0 6 2h1c1-2 3-3 4-2-1-1-3-1-4 0 2-2 5-2 6 0-3-1-5 0-6 2z"/><path fill="#000000" d="M12 9c-4.5 0-8 3-8 6.5S8.5 22 12 22s8-2.9 8-6.5S16.5 9 12 9z"/></svg>`;
+    badge.innerHTML = `Admin <svg width="14" height="14" viewBox="0 0 32 32" style="vertical-align:-2px;">
+      <path fill="#E4322E" d="M16 12c-6 0-10 5-10 11 0 5 4.5 8 10 8s10-3 10-8c0-6-4-11-10-11z"/>
+      <path fill="#C71F2B" d="M16 12c-6 0-10 5-10 11 0 1 .1 2 .3 3C8 22 11 15 16 15s8 7 9.7 11c.2-1 .3-2 .3-3 0-6-4-11-10-11z" opacity="0.35"/>
+      <circle cx="12" cy="18" r="1" fill="#FCE38A"/>
+      <circle cx="16" cy="21" r="1" fill="#FCE38A"/>
+      <circle cx="20" cy="18" r="1" fill="#FCE38A"/>
+      <circle cx="13" cy="24" r="1" fill="#FCE38A"/>
+      <circle cx="19" cy="24" r="1" fill="#FCE38A"/>
+      <circle cx="16" cy="27" r="1" fill="#FCE38A"/>
+      <path fill="#4C9A2A" d="M16 13c-2-3-5-4-8-3 1.5-2 5-2.5 8-.5 3-2 6.5-1.5 8 .5-3-1-6 0-8 3z"/>
+      <path fill="#6CB93F" d="M16 13c-1-2-3-3-5-2.5 1-1 3-1.2 5 .5 2-1.7 4-1.5 5-.5-2-.5-4 .5-5 2.5z"/>
+    </svg>`;
   }
 
   const salutation = document.getElementById("salutation-admin");
