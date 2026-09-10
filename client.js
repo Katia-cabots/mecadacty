@@ -38,6 +38,7 @@ onAuthStateChanged(auth, async (utilisateurFirebase) => {
     utilisateur = { id: utilisateurFirebase.uid, ...snapProfil.data() };
     sessionStorage.setItem("mecadacty_utilisateur", JSON.stringify(utilisateur));
     document.getElementById("salutation-client").textContent = `Bonjour, ${utilisateur.prenom}`;
+    document.getElementById("salutation-entete").textContent = `Bonjour, ${utilisateur.prenom}`;
   } catch (err) {
     console.warn("Impossible de vérifier le profil connecté :", err);
   }
@@ -51,6 +52,7 @@ document.getElementById("btn-deconnexion").addEventListener("click", async () =>
 
 if (utilisateur) {
   document.getElementById("salutation-client").textContent = `Bonjour, ${utilisateur.prenom}`;
+  document.getElementById("salutation-entete").textContent = `Bonjour, ${utilisateur.prenom}`;
 }
 
 // ---------- Navigation entre onglets ----------

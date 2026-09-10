@@ -374,24 +374,29 @@ nav.entete-nav a.actif {
 .liste-atouts {
   list-style: none;
   padding: 0;
-  margin: 18px 0 0 0;
-  display: flex;
-  flex-wrap: wrap;
+  margin: 18px auto 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  max-width: 460px;
+  justify-items: center;
 }
 
 .liste-atouts li {
   background: var(--fond);
   border: 1px solid var(--gris-clair);
   border-radius: 20px;
-  padding: 6px 16px;
-  font-size: 0.85rem;
+  padding: 6px 14px;
+  font-size: 0.8rem;
   color: var(--bleu-profond);
   font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
 }
 
 @media (max-width: 560px) {
   .bloc-presentation { flex-direction: column; align-items: center; text-align: center; }
+  .liste-atouts { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 320px; }
 }
 
 /* ---------- Témoignages ---------- */
@@ -571,11 +576,14 @@ footer.pied a { color: #C8D4DE; }
 
 /* Badge personnel HL — image réelle, dans le pied de page des pages PUBLIQUES uniquement */
 .logo-hl-inline {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
+  background: var(--blanc);
+  border: 2px solid var(--or);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
 
 @media (max-width: 700px) {
@@ -678,12 +686,14 @@ footer.pied a { color: #C8D4DE; }
 .icone-maison {
   color: var(--blanc);
   text-decoration: none;
-  font-size: 1.3rem;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
 }
 
 .app-entete-titre-bloc { text-align: left; }
 .app-entete-titre-bloc .titre-site { font-family: var(--serif); font-weight: 700; font-size: 1.1rem; }
+.app-entete-titre-bloc .salutation-entete { font-size: 0.8rem; color: #C8D4DE; margin-top: 1px; }
 .app-entete-titre-bloc .badge-role {
   display: inline-block;
   margin-top: 3px;

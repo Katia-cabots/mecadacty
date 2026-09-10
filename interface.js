@@ -5,13 +5,15 @@
 import { VERSION_SITE } from "./version.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Bouton "Retour à l'accueil" fixe en haut à droite, sur tout le site
-  if (!document.getElementById("bouton-accueil-global")) {
+  // Bouton "Retour à l'accueil" fixe en haut à droite — uniquement sur les
+  // pages publiques (les espaces Admin/Client ont déjà leur icône maison
+  // dans leur propre en-tête, à côté du bouton "Se déconnecter")
+  if (!document.querySelector(".app-entete") && !document.getElementById("bouton-accueil-global")) {
     const lien = document.createElement("a");
     lien.id = "bouton-accueil-global";
     lien.href = "index.html";
     lien.title = "Retour à l'accueil";
-    lien.textContent = "🏠";
+    lien.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg>`;
     document.body.appendChild(lien);
   }
 

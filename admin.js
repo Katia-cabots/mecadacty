@@ -44,6 +44,8 @@ function appliquerAffichageRole() {
 
   const salutation = document.getElementById("salutation-admin");
   if (salutation && utilisateur) salutation.textContent = `Bonjour, ${utilisateur.prenom}`;
+  const salutationEntete = document.getElementById("salutation-entete");
+  if (salutationEntete && utilisateur) salutationEntete.textContent = `Bonjour, ${utilisateur.prenom}`;
 }
 
 appliquerAffichageRole();
@@ -367,6 +369,99 @@ document.getElementById("btn-ajouter-heures").addEventListener("click", async ()
   }
 });
 
+// ---------- Services affichés sur le site (page Services) ----------
+const servicesParDefaut = [
+  { titre: "Dactylographie & mise en forme de documents", texte: "Courriers, rapports, comptes-rendus de réunion, thèses, présentations — mise en page soignée et relecture." },
+  { titre: "Secrétariat administratif", texte: "Gestion du courrier et des mails, classement, tenue d'agenda, préparation de dossiers, facturation." },
+  { titre: "Renfort temporaire", texte: "Surcharge ponctuelle, pic d'activité, projet particulier : un appui administratif le temps nécessaire." },
+  { titre: "Accompagnement récurrent", texte: "Une présence régulière (hebdomadaire, mensuelle) pour la gestion administrative continue de votre activité." },
+  { titre: "Gestion des boîtes mails qui débordent", texte: "Tri, classement, réponses courantes, mise à plat d'une boîte mail débordée pour retrouver une messagerie sous contrôle." },
+  { titre: "Structuration du système administratif", texte: "Mise en place ou réorganisation de vos outils et process administratifs, pour un fonctionnement plus clair et plus fluide au quotidien." },
+  { titre: "Support client", texte: "Accueil, réponses aux demandes courantes de vos propres clients, suivi des échanges — un relais fiable pour votre service client." },
+  { titre: "Missions sur devis", texte: "Un besoin spécifique non listé ici ? Chaque demande est étudiée pour construire la formule adaptée." }
+];
+
+async function chargerServicesAdmin() {
+  const corps = document.querySelector("#table-services tbody");
+  try {
+    const snap = await getDocs(collection(db, "services"));
+    if (snap.empty) {
+      corps.innerHTML = `<tr><td colspan="4" class="message-vide">Aucun service — clique sur "Initialiser les services par défaut" ou ajoutes-en un toi-même.</td></tr>`;
+      return;
+    }
+    const services = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
+    corps.innerHTML = services.map(s => `
+      <tr>
+        <td>${s.titre}</td>
+        <td>${s.texte}</td>
+        <td>${s.visible ? "Oui" : "Non"}</td>
+        <td>
+          <button class="bouton-mini-discret btn-toggle-service" data-id="${s.id}" data-visible="${s.visible}">${s.visible ? "Masquer" : "Afficher"}</button>
+          <button class="bouton-mini-discret btn-suppr-service" data-id="${s.id}">Supprimer</button>
+        </td>
+      </tr>
+    `).join("");
+
+    document.querySelectorAll(".btn-toggle-service").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await updateDoc(doc(db, "services", bouton.dataset.id), { visible: bouton.dataset.visible !== "true" });
+          chargerServicesAdmin();
+        } catch (err) { console.error(err); }
+      });
+    });
+    document.querySelectorAll(".btn-suppr-service").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "services", bouton.dataset.id));
+          chargerServicesAdmin();
+        } catch (err) { console.error(err); }
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des services.</td></tr>`;
+  }
+}
+
+document.getElementById("btn-ajouter-service").addEventListener("click", async () => {
+  const titre = document.getElementById("se-titre").value.trim();
+  const texte = document.getElementById("se-texte").value.trim();
+  if (!titre || !texte) {
+    afficherBandeau("services-bandeau", "Le titre et le texte sont obligatoires.", "erreur");
+    return;
+  }
+  try {
+    await addDoc(collection(db, "services"), {
+      titre, texte, visible: true, ordre: Date.now(), dateCreation: serverTimestamp()
+    });
+    afficherBandeau("services-bandeau", "Service ajouté.", "succes");
+    document.getElementById("se-titre").value = "";
+    document.getElementById("se-texte").value = "";
+    chargerServicesAdmin();
+  } catch (err) {
+    console.error(err);
+    afficherBandeau("services-bandeau", "Erreur lors de l'ajout du service.", "erreur");
+  }
+});
+
+document.getElementById("btn-init-services").addEventListener("click", async () => {
+  const confirmation = window.confirm("Ajouter les services par défaut (sans écraser ceux déjà présents) ?");
+  if (!confirmation) return;
+  try {
+    for (let i = 0; i < servicesParDefaut.length; i++) {
+      await addDoc(collection(db, "services"), {
+        ...servicesParDefaut[i], visible: true, ordre: i, dateCreation: serverTimestamp()
+      });
+    }
+    afficherBandeau("services-bandeau", "Services par défaut ajoutés.", "succes");
+    chargerServicesAdmin();
+  } catch (err) {
+    console.error(err);
+    afficherBandeau("services-bandeau", "Erreur lors de l'initialisation.", "erreur");
+  }
+});
+
 // ---------- Rendez-vous ----------
 async function chargerRdv() {
   const corps = document.querySelector("#table-rdv tbody");
@@ -524,15 +619,6 @@ const clesContenu = [
   ["accueil_espace_texte", "Accueil — Texte section espace client"],
   ["services_titre", "Services — Titre"],
   ["services_chapo", "Services — Texte d'introduction"],
-  ["service1_titre", "Service 1 — Titre"], ["service1_texte", "Service 1 — Texte"],
-  ["service2_titre", "Service 2 — Titre"], ["service2_texte", "Service 2 — Texte"],
-  ["service3_titre", "Service 3 — Titre"], ["service3_texte", "Service 3 — Texte"],
-  ["service4_titre", "Service 4 — Titre"], ["service4_texte", "Service 4 — Texte"],
-  ["service5_titre", "Service 5 — Titre"], ["service5_texte", "Service 5 — Texte"],
-  ["service6_titre", "Service 6 — Titre"], ["service6_texte", "Service 6 — Texte"],
-  ["service7_titre", "Service 7 — Titre"], ["service7_texte", "Service 7 — Texte"],
-  ["service8_titre", "Service 8 — Titre"], ["service8_texte", "Service 8 — Texte"],
-  ["service9_titre", "Service 9 — Titre"], ["service9_texte", "Service 9 — Texte"],
   ["apropos_titre", "À propos — Titre"],
   ["apropos_katia_titre", "À propos — Nom (présentation)"],
   ["apropos_katia_texte1", "À propos — Présentation, paragraphe 1"],
@@ -851,6 +937,7 @@ async function chargerMotsDePasse() {
     chargerMessages(),
     chargerContenuAdmin(),
     chargerArticles(),
+    chargerServicesAdmin(),
     verifierNotifMessagerie()
   ]);
 })();

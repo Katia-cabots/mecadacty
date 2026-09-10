@@ -1,6 +1,6 @@
 # Mecadacty — Site internet
 
-Version : **V01-018**
+Version : **V01-022**
 
 ## Structure du dépôt GitHub
 Tous les fichiers sont à la racine (HTML, CSS, JS), avec un seul
@@ -97,6 +97,14 @@ dossier `assets/` pour les images — pas de sous-dossiers.
 | visible | boolean | Publié ou masqué |
 | dateCreation | timestamp | |
 
+### `services`
+| Champ | Type | Description |
+|---|---|---|
+| titre, texte | string | Contenu de la carte service (page Services) |
+| visible | boolean | Affiché sur le site ou masqué |
+| ordre | number | Ordre d'affichage |
+| dateCreation | timestamp | |
+
 ### `demandesInscription`
 | Champ | Type | Description |
 |---|---|---|
@@ -125,7 +133,7 @@ peut lire/écrire que ses propres données, seul un compte `admin` voit tout.
 Reste gratuit (offre gratuite Firebase Authentication largement suffisante
 pour ce volume d'utilisateurs).
 
-## Migration vers Firebase Authentication (V01-018)
+## Migration vers Firebase Authentication (V01-022)
 
 Le site utilise maintenant une vraie authentification Firebase (et non plus des mots de passe stockés en clair dans Firestore). **Étapes à suivre dans la console Firebase, dans cet ordre :**
 

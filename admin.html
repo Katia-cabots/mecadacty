@@ -10,9 +10,10 @@
 
 <header class="app-entete">
   <div class="app-entete-gauche">
-    <a href="index.html" class="icone-maison" title="Accueil du site">🏠</a>
+    <a href="index.html" class="icone-maison" title="Accueil du site"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9"/></svg></a>
     <div class="app-entete-titre-bloc">
       <div class="titre-site">Mecadacty</div>
+      <div class="salutation-entete" id="salutation-entete">Bonjour</div>
       <span class="badge-role" id="badge-role">Admin</span>
       <span class="version-tag" id="version-tag"></span>
     </div>
@@ -24,12 +25,13 @@
   <nav class="app-menu">
     <button data-onglet="tableau" class="actif">Tableau de bord</button>
     <button data-onglet="clients">Clients <span class="point-notif" id="notif-clients" style="display:none;"></span></button>
+    <button data-onglet="services">Services (site)</button>
     <button data-onglet="dossiers">Dossiers</button>
     <button data-onglet="heures">Suivi des heures</button>
     <button data-onglet="rdv">Rendez-vous</button>
     <button data-onglet="inscriptions">Demandes d'inscription <span class="point-notif" id="notif-inscriptions" style="display:none;"></span></button>
-    <button data-onglet="messages">Messages <span class="point-notif" id="notif-messages" style="display:none;"></span></button>
-    <button data-onglet="messagerie">Messagerie <span class="point-notif" id="notif-messagerie" style="display:none;"></span></button>
+    <button data-onglet="messages">Formulaire de contact <span class="point-notif" id="notif-messages" style="display:none;"></span></button>
+    <button data-onglet="messagerie">Messagerie clients <span class="point-notif" id="notif-messagerie" style="display:none;"></span></button>
     <button data-onglet="contenu">Contenu du site</button>
     <button data-onglet="articles">Actualités</button>
     <button data-onglet="motsdepasse" id="onglet-btn-motsdepasse" style="display:none;">Mots de passe</button>
@@ -94,6 +96,33 @@
         <h3>Liste des clients</h3>
         <table class="tableau-donnees" id="table-clients">
           <thead><tr><th>Nom</th><th>Contact</th><th>Identifiant</th><th>Dernière connexion</th></tr></thead>
+          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-onglet" id="onglet-services">
+      <div class="entete-onglet">
+        <h2 style="margin:0;">Services affichés sur le site</h2>
+        <button id="btn-init-services" class="bouton-mini-discret">Initialiser les services par défaut</button>
+      </div>
+      <div class="carte">
+        <h3>Ajouter un service</h3>
+        <div class="champ">
+          <label>Titre</label>
+          <input type="text" id="se-titre">
+        </div>
+        <div class="champ">
+          <label>Texte</label>
+          <textarea id="se-texte" rows="3"></textarea>
+        </div>
+        <button id="btn-ajouter-service" class="bouton-primaire" style="border:none; cursor:pointer;">Ajouter</button>
+        <div id="services-bandeau" class="bandeau"></div>
+      </div>
+      <div class="carte">
+        <h3>Liste des services</h3>
+        <table class="tableau-donnees" id="table-services">
+          <thead><tr><th>Titre</th><th>Texte</th><th>Visible</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
         </table>
       </div>
@@ -209,7 +238,7 @@
     </section>
 
     <section class="app-onglet" id="onglet-messages">
-      <h2>Messages reçus</h2>
+      <h2>Formulaire de contact — messages reçus</h2>
       <div class="carte">
         <table class="tableau-donnees" id="table-messages">
           <thead><tr><th>Nom</th><th>Contact</th><th>Message</th><th>Date</th></tr></thead>
@@ -219,7 +248,7 @@
     </section>
 
     <section class="app-onglet" id="onglet-messagerie">
-      <h2>Messagerie</h2>
+      <h2>Messagerie clients</h2>
       <div class="carte">
         <div class="champ">
           <label>Client</label>

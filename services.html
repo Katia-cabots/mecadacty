@@ -36,43 +36,8 @@
 
 <section class="section section-alt">
   <div class="container">
-    <div class="grille-services">
-      <div class="carte-service">
-        <h3 data-contenu="service1_titre">Dactylographie &amp; mise en forme de documents</h3>
-        <p data-contenu="service1_texte">Courriers, rapports, comptes-rendus de réunion, thèses, présentations — mise en page soignée et relecture.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service2_titre">Secrétariat administratif</h3>
-        <p data-contenu="service2_texte">Gestion du courrier et des mails, classement, tenue d'agenda, préparation de dossiers, facturation.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service3_titre">Remplacement congé maternité</h3>
-        <p data-contenu="service3_texte">Une prise en charge complète de votre poste administratif pendant votre absence, sans rupture de service.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service4_titre">Renfort temporaire</h3>
-        <p data-contenu="service4_texte">Surcharge ponctuelle, pic d'activité, projet particulier : un appui administratif le temps nécessaire.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service5_titre">Accompagnement récurrent</h3>
-        <p data-contenu="service5_texte">Une présence régulière (hebdomadaire, mensuelle) pour la gestion administrative continue de votre activité.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service7_titre">Gestion des boîtes mails qui débordent</h3>
-        <p data-contenu="service7_texte">Tri, classement, réponses courantes, mise à plat d'une boîte mail débordée pour retrouver une messagerie sous contrôle.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service8_titre">Structuration du système administratif</h3>
-        <p data-contenu="service8_texte">Mise en place ou réorganisation de vos outils et process administratifs, pour un fonctionnement plus clair et plus fluide au quotidien.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service9_titre">Support client</h3>
-        <p data-contenu="service9_texte">Accueil, réponses aux demandes courantes de vos propres clients, suivi des échanges — un relais fiable pour votre service client.</p>
-      </div>
-      <div class="carte-service">
-        <h3 data-contenu="service6_titre">Missions sur devis</h3>
-        <p data-contenu="service6_texte">Un besoin spécifique non listé ici ? Chaque demande est étudiée pour construire la formule adaptée.</p>
-      </div>
+    <div class="grille-services" id="grille-services">
+      <p class="message-vide">Chargement...</p>
     </div>
     <p style="margin-top:32px;">
       <a href="contact.html" class="bouton-primaire">Demander un devis</a>
@@ -101,5 +66,33 @@
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="contenu.js"></script>
 <script type="module" src="interface.js"></script>
+<script type="module">
+  import { db } from "./firebase-config.js";
+  import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  async function chargerServices() {
+    const conteneur = document.getElementById("grille-services");
+    try {
+      const q = query(collection(db, "services"), where("visible", "==", true));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        conteneur.innerHTML = `<p class="message-vide">Services à venir.</p>`;
+        return;
+      }
+      const services = snap.docs.map(d => d.data()).sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
+      conteneur.innerHTML = services.map(s => `
+        <div class="carte-service">
+          <h3>${s.titre}</h3>
+          <p>${s.texte}</p>
+        </div>
+      `).join("");
+    } catch (err) {
+      console.error(err);
+      conteneur.innerHTML = `<p class="message-vide">Impossible de charger les services pour le moment.</p>`;
+    }
+  }
+
+  chargerServices();
+</script>
 </body>
 </html>
