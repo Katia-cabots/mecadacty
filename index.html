@@ -47,18 +47,22 @@
     <h2 data-contenu="accueil_services_titre">Un appui administratif large, adapté à vos besoins</h2>
     <div class="grille-services">
       <div class="carte-service">
+        <img src="assets/logo-mecadacty-icone.jpg" class="puce-cube" alt="">
         <h3>Dactylographie</h3>
         <p>Courriers, rapports, comptes-rendus, mise en forme de tous types de documents.</p>
       </div>
       <div class="carte-service">
+        <img src="assets/logo-mecadacty-icone.jpg" class="puce-cube" alt="">
         <h3>Gestion administrative</h3>
         <p>Suivi de courrier, classement, organisation de dossiers, gestion d'agenda.</p>
       </div>
       <div class="carte-service">
+        <img src="assets/logo-mecadacty-icone.jpg" class="puce-cube" alt="">
         <h3>Remplacements ponctuels</h3>
         <p>Congé maternité, surcharge temporaire : une présence fiable le temps qu'il faut.</p>
       </div>
       <div class="carte-service">
+        <img src="assets/logo-mecadacty-icone.jpg" class="puce-cube" alt="">
         <h3>Missions récurrentes</h3>
         <p>Un accompagnement administratif régulier, facturé selon la formule qui vous convient.</p>
       </div>
@@ -80,22 +84,8 @@
   <div class="container">
     <p class="eyebrow">Ils lui font confiance</p>
     <h2 data-contenu="temoignages_titre">Ce qu'en disent les clients de MecaDacty</h2>
-    <div class="grille-temoignages">
-      <div class="carte-temoignage">
-        <span class="guillemet">"</span>
-        <p class="citation" data-contenu="temoignage1_texte">Katia a repris la gestion administrative de mon cabinet en quelques jours seulement. Un vrai soulagement.</p>
-        <p class="auteur" data-contenu="temoignage1_auteur">— Client indépendant, Wasseiges</p>
-      </div>
-      <div class="carte-temoignage">
-        <span class="guillemet">"</span>
-        <p class="citation" data-contenu="temoignage2_texte">Rigoureuse et toujours disponible : exactement ce qu'il me fallait pendant mon remplacement de congé maternité.</p>
-        <p class="auteur" data-contenu="temoignage2_auteur">— Petite entreprise locale</p>
-      </div>
-      <div class="carte-temoignage">
-        <span class="guillemet">"</span>
-        <p class="citation" data-contenu="temoignage3_texte">Un vrai gain de temps sur toute la partie administrative — je peux enfin me concentrer sur mon activité.</p>
-        <p class="auteur" data-contenu="temoignage3_auteur">— Profession libérale</p>
-      </div>
+    <div class="grille-temoignages" id="grille-temoignages-accueil">
+      <p class="message-vide">Chargement...</p>
     </div>
   </div>
 </section>
@@ -121,5 +111,35 @@
 <script type="module" src="firebase-config.js"></script>
 <script type="module" src="contenu.js"></script>
 <script type="module" src="interface.js"></script>
+<script type="module">
+  import { db } from "./firebase-config.js";
+  import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  async function chargerTemoignagesAccueil() {
+    const conteneur = document.getElementById("grille-temoignages-accueil");
+    try {
+      const q = query(collection(db, "avis"), where("valide", "==", true), where("misEnAvant", "==", true));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        conteneur.innerHTML = `<p class="message-vide">Aucun avis pour le moment.</p>`;
+        return;
+      }
+      conteneur.innerHTML = snap.docs.slice(0, 3).map(d => {
+        const a = d.data();
+        return `
+        <div class="carte-temoignage">
+          <span class="guillemet">"</span>
+          <p class="citation">${a.texte}</p>
+          <p class="auteur">— ${a.clientNom || "Client MecaDacty"}</p>
+        </div>`;
+      }).join("");
+    } catch (err) {
+      console.error(err);
+      conteneur.innerHTML = `<p class="message-vide">Aucun avis pour le moment.</p>`;
+    }
+  }
+
+  chargerTemoignagesAccueil();
+</script>
 </body>
 </html>

@@ -306,6 +306,15 @@ nav.entete-nav a.actif {
 .carte-service h3 { margin-bottom: 8px; }
 .carte-service p { color: var(--texte-doux); font-size: 0.94rem; margin: 0; }
 
+.puce-cube {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  object-fit: cover;
+  margin-bottom: 8px;
+  display: block;
+}
+
 /* ---------- Formulaires ---------- */
 .champ { margin-bottom: 16px; }
 
@@ -478,25 +487,67 @@ nav.entete-nav a.actif {
 /* ---------- Actualités / conseils ---------- */
 .liste-articles { margin-top: 28px; }
 
-.carte-article {
+.vignette-article {
+  display: flex;
+  gap: 20px;
   background: var(--blanc);
   border: 1px solid var(--gris-clair);
-  border-left: 3px solid var(--bleu-moyen);
   border-radius: var(--rayon);
-  padding: 22px 26px;
+  padding: 20px;
   margin-bottom: 18px;
+  align-items: flex-start;
 }
 
-.carte-article .date-article {
+.vignette-article-photo {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: var(--rayon);
+  flex-shrink: 0;
+  background: var(--fond);
+}
+
+.vignette-article-corps { flex: 1; min-width: 0; }
+.vignette-article-corps h3 { margin: 4px 0 8px 0; }
+
+.vignette-article-resume {
+  color: var(--texte);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.lien-en-savoir-plus {
+  background: none;
+  border: none;
+  color: var(--bleu-moyen);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.date-article {
   color: var(--gris-ardoise);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  margin-bottom: 6px;
 }
 
-.carte-article h3 { margin-bottom: 8px; }
-.carte-article .contenu-article { color: var(--texte); font-size: 0.95rem; white-space: pre-line; }
+.contenu-article {
+  color: var(--texte);
+  font-size: 0.95rem;
+  white-space: pre-line;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gris-clair);
+}
+
+@media (max-width: 520px) {
+  .vignette-article { flex-direction: column; align-items: center; text-align: center; }
+  .vignette-article-photo { width: 100%; height: 160px; }
+}
 
 /* ---------- Carte d'identité légale (société) ---------- */
 .carte-identite {

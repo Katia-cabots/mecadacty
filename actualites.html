@@ -71,6 +71,8 @@
   import { db } from "./firebase-config.js";
   import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+  const PHOTO_DEFAUT = "assets/logo-mecadacty-icone.jpg";
+
   async function chargerArticles() {
     const conteneur = document.getElementById("liste-articles");
     try {
@@ -81,13 +83,27 @@
         return;
       }
       const articles = snap.docs.map(d => d.data()).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
-      conteneur.innerHTML = articles.map(a => `
-        <div class="carte-article">
-          <div class="date-article">${a.date || ""}</div>
-          <h3>${a.titre}</h3>
-          <div class="contenu-article">${a.contenu}</div>
+      conteneur.innerHTML = articles.map((a, i) => `
+        <div class="vignette-article">
+          <img src="${a.photoUrl || PHOTO_DEFAUT}" alt="" class="vignette-article-photo" onerror="this.src='${PHOTO_DEFAUT}'">
+          <div class="vignette-article-corps">
+            <div class="date-article">${a.date || ""}</div>
+            <h3>${a.titre}</h3>
+            <p class="vignette-article-resume">${a.resume || ""}</p>
+            <button class="lien-en-savoir-plus" data-cible="article-complet-${i}">En savoir plus</button>
+            <div class="contenu-article" id="article-complet-${i}" style="display:none;">${a.contenu}</div>
+          </div>
         </div>
       `).join("");
+
+      document.querySelectorAll(".lien-en-savoir-plus").forEach(bouton => {
+        bouton.addEventListener("click", () => {
+          const cible = document.getElementById(bouton.dataset.cible);
+          const ouvert = cible.style.display !== "none";
+          cible.style.display = ouvert ? "none" : "block";
+          bouton.textContent = ouvert ? "En savoir plus" : "Réduire";
+        });
+      });
     } catch (err) {
       console.error(err);
       conteneur.innerHTML = `<p class="message-vide">Impossible de charger les articles pour le moment.</p>`;

@@ -39,18 +39,8 @@ function appliquerAffichageRole() {
     document.getElementById("onglet-btn-motsdepasse").style.display = "block";
   } else {
     // Easter egg discret pour Katia uniquement (comme sur le site des Cabots de Fernelmont)
-    badge.innerHTML = `Admin <svg width="14" height="14" viewBox="0 0 32 32" style="vertical-align:-2px;">
-      <path fill="#E4322E" d="M16 12c-6 0-10 5-10 11 0 5 4.5 8 10 8s10-3 10-8c0-6-4-11-10-11z"/>
-      <path fill="#C71F2B" d="M16 12c-6 0-10 5-10 11 0 1 .1 2 .3 3C8 22 11 15 16 15s8 7 9.7 11c.2-1 .3-2 .3-3 0-6-4-11-10-11z" opacity="0.35"/>
-      <circle cx="12" cy="18" r="1" fill="#FCE38A"/>
-      <circle cx="16" cy="21" r="1" fill="#FCE38A"/>
-      <circle cx="20" cy="18" r="1" fill="#FCE38A"/>
-      <circle cx="13" cy="24" r="1" fill="#FCE38A"/>
-      <circle cx="19" cy="24" r="1" fill="#FCE38A"/>
-      <circle cx="16" cy="27" r="1" fill="#FCE38A"/>
-      <path fill="#4C9A2A" d="M16 13c-2-3-5-4-8-3 1.5-2 5-2.5 8-.5 3-2 6.5-1.5 8 .5-3-1-6 0-8 3z"/>
-      <path fill="#6CB93F" d="M16 13c-1-2-3-3-5-2.5 1-1 3-1.2 5 .5 2-1.7 4-1.5 5-.5-2-.5-4 .5-5 2.5z"/>
-    </svg>`;
+    // Easter egg discret pour Katia uniquement (comme sur le site des Cabots de Fernelmont)
+    badge.textContent = "Admin 🍓";
   }
 
   const salutation = document.getElementById("salutation-admin");
@@ -652,12 +642,6 @@ const clesContenu = [
   ["cgv_intro", "CGV — Texte d'introduction"],
   ["cookies_intro", "Cookies — Texte d'introduction"],
   ["temoignages_titre", "Accueil — Titre section témoignages"],
-  ["temoignage1_texte", "Témoignage 1 — Citation"],
-  ["temoignage1_auteur", "Témoignage 1 — Auteur"],
-  ["temoignage2_texte", "Témoignage 2 — Citation"],
-  ["temoignage2_auteur", "Témoignage 2 — Auteur"],
-  ["temoignage3_texte", "Témoignage 3 — Citation"],
-  ["temoignage3_auteur", "Témoignage 3 — Auteur"],
   ["actualites_titre", "Actualités — Titre"],
   ["actualites_chapo", "Actualités — Texte d'introduction"],
   ["avis_titre", "Avis — Titre"],
@@ -744,18 +728,22 @@ document.getElementById("btn-ajouter-article").addEventListener("click", async (
   const titre = document.getElementById("ar-titre").value.trim();
   const contenu = document.getElementById("ar-contenu").value.trim();
   const date = document.getElementById("ar-date").value;
+  const photoUrl = document.getElementById("ar-photo").value.trim();
+  const resume = document.getElementById("ar-resume").value.trim();
   if (!titre || !contenu) {
     afficherBandeau("articles-bandeau", "Le titre et le contenu sont obligatoires.", "erreur");
     return;
   }
   try {
     await addDoc(collection(db, "articles"), {
-      titre, contenu, date, visible: true, dateCreation: serverTimestamp()
+      titre, contenu, date, photoUrl, resume, visible: true, dateCreation: serverTimestamp()
     });
     afficherBandeau("articles-bandeau", "Article publié.", "succes");
     document.getElementById("ar-titre").value = "";
     document.getElementById("ar-contenu").value = "";
     document.getElementById("ar-date").value = "";
+    document.getElementById("ar-photo").value = "";
+    document.getElementById("ar-resume").value = "";
     chargerArticles();
   } catch (err) {
     console.error(err);
@@ -889,15 +877,21 @@ async function chargerAvisAdmin() {
       return;
     }
     const avisListe = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.valide === b.valide) ? 0 : (a.valide ? 1 : -1));
+    const nbMisEnAvant = avisListe.filter(a => a.misEnAvant).length;
     corps.innerHTML = avisListe.map(a => {
       const etoiles = "★".repeat(a.note || 0) + "☆".repeat(5 - (a.note || 0));
+      let boutonUne = "";
+      if (a.valide) {
+        boutonUne = `<button class="bouton-mini-discret btn-une-avis" data-id="${a.id}" data-une="${a.misEnAvant}">${a.misEnAvant ? "Retirer de la une" : "Mettre à la une"}</button>`;
+      }
       return `<tr>
-        <td>${a.clientNom || "—"}</td>
+        <td>${a.clientNom || "—"}${a.misEnAvant ? ' <span class="statut-pastille statut-termine">À la une</span>' : ""}</td>
         <td>${etoiles}</td>
         <td>${a.texte}</td>
         <td><span class="statut-pastille ${a.valide ? "statut-termine" : "statut-attente"}">${a.valide ? "Publié" : "En attente"}</span></td>
         <td>
           <button class="bouton-mini-discret btn-valider-avis" data-id="${a.id}" data-valide="${a.valide}">${a.valide ? "Dépublier" : "Valider"}</button>
+          ${boutonUne}
           <button class="bouton-mini-discret btn-suppr-avis" data-id="${a.id}">Supprimer</button>
         </td>
       </tr>`;
@@ -907,6 +901,19 @@ async function chargerAvisAdmin() {
       bouton.addEventListener("click", async () => {
         try {
           await updateDoc(doc(db, "avis", bouton.dataset.id), { valide: bouton.dataset.valide !== "true" });
+          chargerAvisAdmin();
+        } catch (err) { console.error(err); }
+      });
+    });
+    document.querySelectorAll(".btn-une-avis").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        const activerUne = bouton.dataset.une !== "true";
+        if (activerUne && nbMisEnAvant >= 3) {
+          afficherBandeau("avis-bandeau", "3 avis sont déjà à la une — retire-en un avant d'en ajouter un autre.", "erreur");
+          return;
+        }
+        try {
+          await updateDoc(doc(db, "avis", bouton.dataset.id), { misEnAvant: activerUne });
           chargerAvisAdmin();
         } catch (err) { console.error(err); }
       });

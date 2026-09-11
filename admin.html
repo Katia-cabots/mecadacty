@@ -269,12 +269,13 @@
 
     <section class="app-onglet" id="onglet-avis">
       <h2>Avis clients</h2>
-      <p style="color:var(--texte-doux); font-size:0.9rem;">Valide un avis pour qu'il apparaisse sur la page publique "Ils parlent de nous".</p>
+      <p style="color:var(--texte-doux); font-size:0.9rem;">Valide un avis pour qu'il apparaisse sur la page publique "Ils parlent de nous". Choisis jusqu'à 3 avis validés à mettre "à la une" sur la page d'accueil.</p>
       <div class="carte">
         <table class="tableau-donnees" id="table-avis">
           <thead><tr><th>Client</th><th>Note</th><th>Avis</th><th>Statut</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
         </table>
+        <div id="avis-bandeau" class="bandeau"></div>
       </div>
     </section>
 
@@ -304,7 +305,16 @@
           <input type="date" id="ar-date">
         </div>
         <div class="champ">
-          <label>Contenu</label>
+          <label>Photo (URL)</label>
+          <input type="url" id="ar-photo" placeholder="https://...">
+          <p class="champ-aide">Lien direct vers une image (facultatif). Une image par défaut sera utilisée si ce champ reste vide.</p>
+        </div>
+        <div class="champ">
+          <label>Phrase résumé (accroche affichée sur la vignette)</label>
+          <input type="text" id="ar-resume" placeholder="Une phrase choc qui donne envie de cliquer...">
+        </div>
+        <div class="champ">
+          <label>Contenu complet</label>
           <textarea id="ar-contenu" rows="5"></textarea>
         </div>
         <button id="btn-ajouter-article" class="bouton-primaire" style="border:none; cursor:pointer;">Publier l'article</button>

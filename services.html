@@ -87,6 +87,7 @@
       const services = snap.docs.map(d => d.data()).sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0));
       conteneur.innerHTML = services.map(s => `
         <div class="carte-service">
+          <img src="assets/logo-mecadacty-icone.jpg" class="puce-cube" alt="">
           <h3>${s.titre}</h3>
           <p>${s.texte}</p>
         </div>
