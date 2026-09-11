@@ -1,6 +1,6 @@
 # mecadacty — Site internet
 
-Version : **V01-035**
+Version : **V01-036**
 
 ## Structure du dépôt GitHub
 Tous les fichiers sont à la racine (HTML, CSS, JS), avec un seul
@@ -69,6 +69,7 @@ dossier `assets/` pour les images — pas de sous-dossiers.
 | creneauChoisi | string ou null | Le créneau validé par l'admin parmi les proposés |
 | objet | string | Objet du rendez-vous |
 | confirme | boolean | `true` une fois qu'un créneau a été validé |
+| facturable | boolean | `false` = rendez-vous non facturable (défaut : `true`) |
 | dateCreation | timestamp | |
 
 ### `heures`
@@ -123,7 +124,8 @@ dossier `assets/` pour les images — pas de sous-dossiers.
 |---|---|---|
 | nom, prenom, gsm, email | string | Coordonnées du demandeur |
 | date | timestamp | |
-| traitee | boolean | `false` = en attente (point rouge admin) |
+| traitee | boolean | `true` une fois convertie en compte client |
+| statut | string | `"nouveau"`, `"en_cours"` ou `"converti"` (suivi façon CRM) |
 
 ### `messagesContact`
 | Champ | Type | Description |
@@ -132,6 +134,7 @@ dossier `assets/` pour les images — pas de sous-dossiers.
 | message | string | Contenu du message |
 | date | timestamp | |
 | lu | boolean | `false` = non lu (point rouge admin) |
+| statut | string | `"nouveau"`, `"en_cours"` ou `"traite"` (suivi façon CRM) |
 
 ### `contenu` (document unique `site`)
 Un seul document contenant toutes les clés de texte éditable des
@@ -146,7 +149,7 @@ peut lire/écrire que ses propres données, seul un compte `admin` voit tout.
 Reste gratuit (offre gratuite Firebase Authentication largement suffisante
 pour ce volume d'utilisateurs).
 
-## Migration vers Firebase Authentication (V01-035)
+## Migration vers Firebase Authentication (V01-036)
 
 Le site utilise maintenant une vraie authentification Firebase (et non plus des mots de passe stockés en clair dans Firestore). **Étapes à suivre dans la console Firebase, dans cet ordre :**
 

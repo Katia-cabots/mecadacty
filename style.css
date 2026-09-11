@@ -407,6 +407,7 @@ nav.entete-nav a.actif {
 }
 
 .bloc-presentation .presentation-texte { flex: 1; min-width: 260px; }
+.bloc-presentation .presentation-texte p { text-align: justify; }
 
 .bloc-presentation img.portrait.logo-presentation {
   width: 260px;
@@ -755,6 +756,16 @@ footer.pied a { color: #C8D4DE; }
   font-size: 1.1rem;
   text-decoration: none;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.message-complet-deplie {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--fond);
+  border-radius: var(--rayon);
+  font-size: 0.9rem;
+  white-space: pre-line;
+  max-width: 340px;
 }
 
 /* ---------- Bouton de réinitialisation du contenu ---------- */

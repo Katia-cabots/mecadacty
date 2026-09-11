@@ -29,6 +29,7 @@
     <button data-onglet="services">Services (site)</button>
     <button data-onglet="dossiers">Dossiers</button>
     <button data-onglet="heures">Suivi des heures</button>
+    <button data-onglet="facturation">À facturer</button>
     <button data-onglet="rdv">Rendez-vous</button>
     <button data-onglet="inscriptions">Demandes d'inscription <span class="point-notif" id="notif-inscriptions" style="display:none;"></span></button>
     <button data-onglet="messages">Formulaire de contact <span class="point-notif" id="notif-messages" style="display:none;"></span></button>
@@ -201,6 +202,17 @@
       </div>
     </section>
 
+    <section class="app-onglet" id="onglet-facturation">
+      <h2>À facturer</h2>
+      <p style="color:var(--texte-doux); font-size:0.9rem;">Résumé par client : heures prestées enregistrées et rendez-vous confirmés facturables — à utiliser comme base pour établir tes factures.</p>
+      <div class="carte">
+        <table class="tableau-donnees" id="table-facturation">
+          <thead><tr><th>Client</th><th>Total heures</th><th>RDV confirmés facturables</th></tr></thead>
+          <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="app-onglet" id="onglet-rdv">
       <h2>Rendez-vous</h2>
       <div class="carte">
@@ -223,8 +235,8 @@
       <div class="carte">
         <h3>Tous les rendez-vous</h3>
         <table class="tableau-donnees" id="table-rdv">
-          <thead><tr><th>Client</th><th>Objet</th><th>Créneaux / Validation</th></tr></thead>
-          <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
+          <thead><tr><th>Client</th><th>Objet</th><th>Créneaux / Validation</th><th>Facturation</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -233,8 +245,8 @@
       <h2>Demandes d'inscription</h2>
       <div class="carte">
         <table class="tableau-donnees" id="table-inscriptions">
-          <thead><tr><th>Nom</th><th>Contact</th><th>Date</th><th>Action</th></tr></thead>
-          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+          <thead><tr><th>Nom</th><th>Contact</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
+          <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -243,8 +255,8 @@
       <h2>Formulaire de contact — messages reçus</h2>
       <div class="carte">
         <table class="tableau-donnees" id="table-messages">
-          <thead><tr><th>Nom</th><th>Contact</th><th>Message</th><th>Date</th></tr></thead>
-          <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
+          <thead><tr><th>Nom</th><th>Contact</th><th>Message</th><th>Date</th><th>Statut</th></tr></thead>
+          <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
         </table>
       </div>
     </section>

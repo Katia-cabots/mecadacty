@@ -90,6 +90,7 @@ document.querySelectorAll(".app-menu button[data-onglet]").forEach((bouton) => {
     if (bouton.dataset.onglet === "messages") marquerMessagesLus();
     if (bouton.dataset.onglet === "motsdepasse") chargerMotsDePasse();
     if (bouton.dataset.onglet === "messagerie") ouvrirOngletMessagerie();
+    if (bouton.dataset.onglet === "facturation") chargerFacturation();
   });
 });
 
@@ -370,6 +371,49 @@ document.getElementById("btn-ajouter-heures").addEventListener("click", async ()
   }
 });
 
+// ---------- À facturer (résumé par client) ----------
+async function chargerFacturation() {
+  const corps = document.querySelector("#table-facturation tbody");
+  try {
+    const [heuresSnap, rdvSnap] = await Promise.all([
+      getDocs(collection(db, "heures")),
+      getDocs(collection(db, "rdv"))
+    ]);
+
+    if (listeClients.length === 0) {
+      corps.innerHTML = `<tr><td colspan="3" class="message-vide">Aucun client pour le moment.</td></tr>`;
+      return;
+    }
+
+    const lignes = listeClients.map(c => {
+      const totalHeures = heuresSnap.docs
+        .filter(d => d.data().clientId === c.id)
+        .reduce((somme, d) => somme + (Number(d.data().heures) || 0), 0);
+      const nbRdvFacturables = rdvSnap.docs.filter(d => {
+        const data = d.data();
+        return data.clientId === c.id && data.creneauChoisi && data.facturable !== false;
+      }).length;
+      return { nom: `${c.prenom} ${c.nom}`, totalHeures, nbRdvFacturables };
+    }).filter(l => l.totalHeures > 0 || l.nbRdvFacturables > 0);
+
+    if (lignes.length === 0) {
+      corps.innerHTML = `<tr><td colspan="3" class="message-vide">Rien à facturer pour le moment.</td></tr>`;
+      return;
+    }
+
+    corps.innerHTML = lignes.map(l => `
+      <tr>
+        <td>${l.nom}</td>
+        <td>${l.totalHeures} heure(s)</td>
+        <td>${l.nbRdvFacturables}</td>
+      </tr>
+    `).join("");
+  } catch (err) {
+    console.error(err);
+    corps.innerHTML = `<tr><td colspan="3" class="message-vide">Erreur de chargement de la facturation.</td></tr>`;
+  }
+}
+
 // ---------- Services affichés sur le site (page Services) ----------
 const servicesParDefaut = [
   { titre: "Dactylographie & mise en forme de documents", texte: "Courriers, rapports, comptes-rendus de réunion, thèses, présentations — mise en page soignée et relecture." },
@@ -469,7 +513,7 @@ async function chargerRdv() {
   try {
     const snap = await getDocs(collection(db, "rdv"));
     if (snap.empty) {
-      corps.innerHTML = `<tr><td colspan="3" class="message-vide">Aucun rendez-vous pour le moment.</td></tr>`;
+      corps.innerHTML = `<tr><td colspan="5" class="message-vide">Aucun rendez-vous pour le moment.</td></tr>`;
       return;
     }
     corps.innerHTML = snap.docs.map(d => {
@@ -482,14 +526,21 @@ async function chargerRdv() {
         colonneCreneaux = data.creneauxProposes.map(c => `
           <button class="bouton-mini-discret btn-valider-creneau" data-id="${d.id}" data-creneau="${c}">
             Valider : ${new Date(c).toLocaleString("fr-BE")}
-          </button>`).join("<br>");
+          </button>`).join("<br>") + `
+          <div style="margin-top:6px;">
+            <input type="datetime-local" class="input-autre-creneau" data-id="${d.id}" style="font-size:0.8rem; padding:4px;">
+            <button class="bouton-mini-discret btn-autre-creneau" data-id="${d.id}">Proposer un autre horaire</button>
+          </div>`;
       } else {
         colonneCreneaux = data.date ? new Date(data.date).toLocaleString("fr-BE") : "—";
       }
+      const facturable = data.facturable !== false; // true par défaut
       return `<tr>
         <td>${client ? client.prenom + " " + client.nom : "—"}</td>
         <td>${data.objet || ""}</td>
         <td>${colonneCreneaux}</td>
+        <td><button class="bouton-mini-discret btn-toggle-facturable-rdv" data-id="${d.id}" data-facturable="${facturable}">${facturable ? "Facturable ✓" : "Non facturable"}</button></td>
+        <td><button class="bouton-mini-discret btn-suppr-rdv" data-id="${d.id}">Supprimer</button></td>
       </tr>`;
     }).join("");
 
@@ -501,9 +552,38 @@ async function chargerRdv() {
         } catch (err) { console.error(err); }
       });
     });
+    document.querySelectorAll(".btn-autre-creneau").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        const input = document.querySelector(`.input-autre-creneau[data-id="${bouton.dataset.id}"]`);
+        if (!input.value) {
+          afficherBandeau("rdv-bandeau", "Choisis une date avant de proposer un autre horaire.", "erreur");
+          return;
+        }
+        try {
+          await updateDoc(doc(db, "rdv", bouton.dataset.id), { creneauChoisi: input.value, confirme: true });
+          chargerRdv();
+        } catch (err) { console.error(err); }
+      });
+    });
+    document.querySelectorAll(".btn-toggle-facturable-rdv").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await updateDoc(doc(db, "rdv", bouton.dataset.id), { facturable: bouton.dataset.facturable !== "true" });
+          chargerRdv();
+        } catch (err) { console.error(err); }
+      });
+    });
+    document.querySelectorAll(".btn-suppr-rdv").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        try {
+          await deleteDoc(doc(db, "rdv", bouton.dataset.id));
+          chargerRdv();
+        } catch (err) { console.error(err); }
+      });
+    });
   } catch (err) {
     console.error(err);
-    corps.innerHTML = `<tr><td colspan="3" class="message-vide">Erreur de chargement des rendez-vous.</td></tr>`;
+    corps.innerHTML = `<tr><td colspan="5" class="message-vide">Erreur de chargement des rendez-vous.</td></tr>`;
   }
 }
 
@@ -534,25 +614,46 @@ document.getElementById("btn-ajouter-rdv").addEventListener("click", async () =>
 });
 
 // ---------- Demandes d'inscription ----------
+const LIBELLES_STATUT_INSCRIPTION = { nouveau: ["statut-attente", "Nouveau"], en_cours: ["statut-en-cours", "En cours"], converti: ["statut-termine", "Converti en client"] };
+
 async function chargerInscriptions() {
   const corps = document.querySelector("#table-inscriptions tbody");
   try {
     const snap = await getDocs(collection(db, "demandesInscription"));
     if (snap.empty) {
-      corps.innerHTML = `<tr><td colspan="4" class="message-vide">Aucune demande en attente.</td></tr>`;
+      corps.innerHTML = `<tr><td colspan="5" class="message-vide">Aucune demande en attente.</td></tr>`;
       return;
     }
     corps.innerHTML = snap.docs.map(d => {
       const data = d.data();
       const dateAffichee = data.date && data.date.toDate ? data.date.toDate().toLocaleDateString("fr-BE") : "";
+      const statut = data.statut || (data.traitee ? "converti" : "nouveau");
+      const [classe, libelle] = LIBELLES_STATUT_INSCRIPTION[statut] || LIBELLES_STATUT_INSCRIPTION.nouveau;
+      const actionConvertir = statut === "converti"
+        ? ""
+        : `<button data-id="${d.id}" data-nom="${data.nom}" data-prenom="${data.prenom}" data-gsm="${data.gsm||''}" data-email="${data.email||''}" class="btn-convertir bouton-mini-discret">Créer le compte</button>`;
       return `<tr>
         <td>${data.prenom} ${data.nom}</td>
         <td>${data.gsm || ""}<br>${data.email || ""}</td>
         <td>${dateAffichee}</td>
-        <td>${data.traitee ? "Traitée" : `<button data-id="${d.id}" data-nom="${data.nom}" data-prenom="${data.prenom}" data-gsm="${data.gsm||''}" data-email="${data.email||''}" class="btn-convertir bouton-mini-discret">Créer le compte</button>`}</td>
+        <td>
+          <span class="statut-pastille ${classe}">${libelle}</span>
+          ${statut !== "converti" ? `<br><select class="select-statut-inscription" data-id="${d.id}" style="margin-top:4px;">
+            <option value="nouveau" ${statut === "nouveau" ? "selected" : ""}>Nouveau</option>
+            <option value="en_cours" ${statut === "en_cours" ? "selected" : ""}>En cours</option>
+          </select>` : ""}
+        </td>
+        <td>${actionConvertir}</td>
       </tr>`;
     }).join("");
 
+    document.querySelectorAll(".select-statut-inscription").forEach(select => {
+      select.addEventListener("change", async () => {
+        try {
+          await updateDoc(doc(db, "demandesInscription", select.dataset.id), { statut: select.value });
+        } catch (err) { console.error(err); }
+      });
+    });
     document.querySelectorAll(".btn-convertir").forEach(bouton => {
       bouton.addEventListener("click", () => {
         document.querySelector('.app-menu button[data-onglet="clients"]').click();
@@ -561,17 +662,18 @@ async function chargerInscriptions() {
         document.getElementById("cl-prenom").value = bouton.dataset.prenom;
         document.getElementById("cl-gsm").value = bouton.dataset.gsm;
         document.getElementById("cl-email").value = bouton.dataset.email;
-        updateDoc(doc(db, "demandesInscription", bouton.dataset.id), { traitee: true }).catch(console.error);
+        updateDoc(doc(db, "demandesInscription", bouton.dataset.id), { traitee: true, statut: "converti" }).catch(console.error);
       });
     });
   } catch (err) {
     console.error(err);
-    corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des demandes.</td></tr>`;
+    corps.innerHTML = `<tr><td colspan="5" class="message-vide">Erreur de chargement des demandes.</td></tr>`;
   }
 }
 
-// ---------- Messages de contact ----------
+// ---------- Messages de contact (suivi façon CRM) ----------
 let messagesNonLus = [];
+const LIBELLES_STATUT_MSG = { nouveau: ["statut-attente", "Nouveau"], en_cours: ["statut-en-cours", "En cours"], traite: ["statut-termine", "Traité"] };
 
 async function chargerMessages() {
   const corps = document.querySelector("#table-messages tbody");
@@ -582,22 +684,51 @@ async function chargerMessages() {
       document.getElementById("notif-messages").style.display = "inline-block";
     }
     if (snap.empty) {
-      corps.innerHTML = `<tr><td colspan="4" class="message-vide">Aucun message reçu.</td></tr>`;
+      corps.innerHTML = `<tr><td colspan="5" class="message-vide">Aucun message reçu.</td></tr>`;
       return;
     }
     corps.innerHTML = snap.docs.map(d => {
       const data = d.data();
       const dateAffichee = data.date && data.date.toDate ? data.date.toDate().toLocaleDateString("fr-BE") : "";
+      const statut = data.statut || "nouveau";
+      const apercu = (data.message || "").length > 60 ? data.message.slice(0, 60) + "…" : data.message;
       return `<tr>
         <td>${data.nom}</td>
         <td>${data.gsm || ""}<br>${data.email || ""}</td>
-        <td>${data.message}</td>
+        <td>
+          <span class="apercu-message">${apercu}</span>
+          <button class="lien-en-savoir-plus btn-voir-message" data-id="${d.id}">Voir le message complet</button>
+          <div class="message-complet-deplie" id="msg-complet-${d.id}" style="display:none;">${data.message}</div>
+        </td>
         <td>${dateAffichee}</td>
+        <td>
+          <select class="select-statut-message" data-id="${d.id}">
+            <option value="nouveau" ${statut === "nouveau" ? "selected" : ""}>Nouveau</option>
+            <option value="en_cours" ${statut === "en_cours" ? "selected" : ""}>En cours</option>
+            <option value="traite" ${statut === "traite" ? "selected" : ""}>Traité</option>
+          </select>
+        </td>
       </tr>`;
     }).join("");
+
+    document.querySelectorAll(".btn-voir-message").forEach(bouton => {
+      bouton.addEventListener("click", () => {
+        const cible = document.getElementById("msg-complet-" + bouton.dataset.id);
+        const ouvert = cible.style.display !== "none";
+        cible.style.display = ouvert ? "none" : "block";
+        bouton.textContent = ouvert ? "Voir le message complet" : "Réduire";
+      });
+    });
+    document.querySelectorAll(".select-statut-message").forEach(select => {
+      select.addEventListener("change", async () => {
+        try {
+          await updateDoc(doc(db, "messagesContact", select.dataset.id), { statut: select.value });
+        } catch (err) { console.error(err); }
+      });
+    });
   } catch (err) {
     console.error(err);
-    corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des messages.</td></tr>`;
+    corps.innerHTML = `<tr><td colspan="5" class="message-vide">Erreur de chargement des messages.</td></tr>`;
   }
 }
 
