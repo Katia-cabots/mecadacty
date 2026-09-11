@@ -681,6 +681,8 @@ document.getElementById("btn-enregistrer-contenu").addEventListener("click", asy
 });
 
 // ---------- Actualités / conseils ----------
+let articleEnEdition = null;
+
 async function chargerArticles() {
   const corps = document.querySelector("#table-articles tbody");
   try {
@@ -696,6 +698,7 @@ async function chargerArticles() {
         <td>${a.titre}</td>
         <td>${a.visible ? "Oui" : "Non"}</td>
         <td>
+          <button class="bouton-mini-discret btn-modifier-article" data-id="${a.id}">Modifier</button>
           <button class="bouton-mini-discret btn-toggle-article" data-id="${a.id}" data-visible="${a.visible}">${a.visible ? "Masquer" : "Publier"}</button>
           <button class="bouton-mini-discret btn-suppr-article" data-id="${a.id}">Supprimer</button>
         </td>
@@ -714,8 +717,25 @@ async function chargerArticles() {
       bouton.addEventListener("click", async () => {
         try {
           await deleteDoc(doc(db, "articles", bouton.dataset.id));
+          if (articleEnEdition === bouton.dataset.id) annulerEditionArticle();
           chargerArticles();
         } catch (err) { console.error(err); }
+      });
+    });
+    document.querySelectorAll(".btn-modifier-article").forEach(bouton => {
+      bouton.addEventListener("click", () => {
+        const a = articles.find(x => x.id === bouton.dataset.id);
+        if (!a) return;
+        articleEnEdition = a.id;
+        document.getElementById("ar-titre").value = a.titre || "";
+        document.getElementById("ar-contenu").value = a.contenu || "";
+        document.getElementById("ar-date").value = a.date || "";
+        document.getElementById("ar-photo").value = a.photoUrl || "";
+        document.getElementById("ar-resume").value = a.resume || "";
+        document.getElementById("btn-ajouter-article").textContent = "Enregistrer les modifications";
+        document.getElementById("btn-annuler-edition-article").style.display = "inline-block";
+        document.querySelector('.app-menu button[data-onglet="articles"]').click();
+        document.getElementById("ar-titre").scrollIntoView({ behavior: "smooth", block: "center" });
       });
     });
   } catch (err) {
@@ -723,6 +743,14 @@ async function chargerArticles() {
     corps.innerHTML = `<tr><td colspan="4" class="message-vide">Erreur de chargement des articles.</td></tr>`;
   }
 }
+
+function annulerEditionArticle() {
+  articleEnEdition = null;
+  ["ar-titre", "ar-contenu", "ar-date", "ar-photo", "ar-resume"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("btn-ajouter-article").textContent = "Publier l'article";
+  document.getElementById("btn-annuler-edition-article").style.display = "none";
+}
+document.getElementById("btn-annuler-edition-article").addEventListener("click", annulerEditionArticle);
 
 document.getElementById("btn-ajouter-article").addEventListener("click", async () => {
   const titre = document.getElementById("ar-titre").value.trim();
@@ -735,19 +763,21 @@ document.getElementById("btn-ajouter-article").addEventListener("click", async (
     return;
   }
   try {
-    await addDoc(collection(db, "articles"), {
-      titre, contenu, date, photoUrl, resume, visible: true, dateCreation: serverTimestamp()
-    });
-    afficherBandeau("articles-bandeau", "Article publié.", "succes");
-    document.getElementById("ar-titre").value = "";
-    document.getElementById("ar-contenu").value = "";
-    document.getElementById("ar-date").value = "";
-    document.getElementById("ar-photo").value = "";
-    document.getElementById("ar-resume").value = "";
+    if (articleEnEdition) {
+      await updateDoc(doc(db, "articles", articleEnEdition), { titre, contenu, date, photoUrl, resume });
+      afficherBandeau("articles-bandeau", "Article modifié.", "succes");
+      annulerEditionArticle();
+    } else {
+      await addDoc(collection(db, "articles"), {
+        titre, contenu, date, photoUrl, resume, visible: true, dateCreation: serverTimestamp()
+      });
+      afficherBandeau("articles-bandeau", "Article publié.", "succes");
+      ["ar-titre", "ar-contenu", "ar-date", "ar-photo", "ar-resume"].forEach(id => document.getElementById(id).value = "");
+    }
     chargerArticles();
   } catch (err) {
     console.error(err);
-    afficherBandeau("articles-bandeau", "Erreur lors de la publication de l'article.", "erreur");
+    afficherBandeau("articles-bandeau", "Erreur lors de l'enregistrement de l'article.", "erreur");
   }
 });
 

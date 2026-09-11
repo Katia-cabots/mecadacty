@@ -501,10 +501,12 @@ nav.entete-nav a.actif {
 .vignette-article-photo {
   width: 96px;
   height: 96px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: var(--rayon);
   flex-shrink: 0;
-  background: var(--fond);
+  background: var(--blanc);
+  border: 1px solid var(--gris-clair);
+  padding: 6px;
 }
 
 .vignette-article-corps { flex: 1; min-width: 0; }
