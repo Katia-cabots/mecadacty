@@ -558,13 +558,15 @@ nav.entete-nav a.actif {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: var(--ombre);
-  max-width: 480px;
+  max-width: 100%;
+  width: 100%;
   margin: 20px 0;
 }
 
 .carte-identite-logo {
   background: var(--bleu-profond);
-  width: 130px;
+  width: 34%;
+  max-width: 160px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -573,35 +575,44 @@ nav.entete-nav a.actif {
 }
 
 .carte-identite-logo img {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--or);
+  width: 100%;
+  height: auto;
+  max-width: 110px;
+  object-fit: contain;
+  border-radius: 8px;
   background: var(--blanc);
+  padding: 8px;
 }
 
 .carte-identite-infos {
   background: var(--blanc);
-  padding: 18px 22px;
+  padding: 20px 24px;
   flex: 1;
+  min-width: 0;
 }
 
-.carte-identite-infos h3 { margin-bottom: 2px; font-size: 1.1rem; }
+.carte-identite-infos h3 { margin-bottom: 2px; font-size: 1.15rem; }
 
 .carte-identite-societe {
   color: var(--or);
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   letter-spacing: 0.03em;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .carte-identite-ligne {
   display: flex;
   gap: 10px;
-  font-size: 0.86rem;
-  margin-bottom: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.carte-identite-ligne span:not(.etiquette) {
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 .carte-identite-ligne .etiquette {
@@ -610,6 +621,7 @@ nav.entete-nav a.actif {
   font-weight: 700;
   letter-spacing: 0.04em;
   min-width: 62px;
+  flex-shrink: 0;
   text-transform: uppercase;
   padding-top: 1px;
 }
