@@ -1,7 +1,7 @@
 // ============================================================
 // Projet Firebase : mecadacty-51f6f
 // Référence projet : Mecadacty — site internet
-// Version du site : V01-037
+// Version du site : V01-038
 // Authentification : Firebase Authentication (Email/Mot de passe)
 // ============================================================
 // Ces règles vérifient réellement l'identité de la personne

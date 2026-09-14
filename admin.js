@@ -758,6 +758,8 @@ const clesContenu = [
   ["apropos_katia_texte3", "À propos — Présentation, paragraphe 3"],
   ["apropos_texte1", "À propos — Paragraphe 1 (Mecadacty)"],
   ["apropos_texte2", "À propos — Paragraphe 2 (Mecadacty)"],
+  ["histoire_nom_titre", "À propos — Titre histoire du nom"],
+  ["histoire_nom_texte", "À propos — Texte histoire du nom"],
   ["contact_titre", "Contact — Titre"],
   ["contact_chapo", "Contact — Texte d'introduction"],
   ["contact_gsm", "Contact — Ligne téléphone"],
