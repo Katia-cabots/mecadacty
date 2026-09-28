@@ -48,6 +48,25 @@
       <div class="carte" id="resume-tableau">
         <p class="message-vide">Chargement...</p>
       </div>
+      <div class="carte">
+        <h3>Changer mon mot de passe</h3>
+        <div class="champ">
+          <label>Mot de passe actuel</label>
+          <div class="champ-mdp-wrap">
+            <input type="password" id="mdp-actuel" class="sans-caracteres-speciaux">
+            <button type="button" class="oeil-toggle">👁</button>
+          </div>
+        </div>
+        <div class="champ">
+          <label>Nouveau mot de passe (6 caractères minimum)</label>
+          <div class="champ-mdp-wrap">
+            <input type="password" id="mdp-nouveau" class="sans-caracteres-speciaux">
+            <button type="button" class="oeil-toggle">👁</button>
+          </div>
+        </div>
+        <button id="btn-changer-mdp" class="bouton-primaire" style="border:none; cursor:pointer;">Changer mon mot de passe</button>
+        <div id="changer-mdp-bandeau" class="bandeau"></div>
+      </div>
     </section>
 
     <section class="app-onglet" id="onglet-clients">
@@ -344,7 +363,8 @@
 
     <section class="app-onglet" id="onglet-motsdepasse">
       <h2>Comptes <span style="font-size:0.75rem; color:var(--texte-doux); font-weight:400;">(visible uniquement sur ce compte)</span></h2>
-      <p style="color:var(--texte-doux); font-size:0.88rem;">Le mot de passe affiché est une copie de confort connue à la création du compte — elle ne se met pas à jour toute seule si la personne change son mot de passe elle-même. Utilise le lien de réinitialisation pour lui en fixer un nouveau.</p>
+      <p style="color:var(--texte-doux); font-size:0.88rem;">Le bouton "Changer" fixe un vrai nouveau mot de passe de connexion (en utilisant celui déjà stocké pour s'identifier brièvement à la place de la personne). Si ça échoue, c'est que le mot de passe stocké est périmé — utilise alors le lien de réinitialisation par e-mail.</p>
+      <p style="color:var(--texte-doux); font-size:0.88rem;">Le mot de passe affiché est une copie de confort, mise à jour automatiquement à chaque changement effectué depuis le site.</p>
       <div class="carte">
         <table class="tableau-donnees" id="table-motsdepasse">
           <thead><tr><th>Nom</th><th>Identifiant</th><th>Mot de passe</th><th>Rôle</th><th>Dernière connexion</th><th>Action</th></tr></thead>

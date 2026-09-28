@@ -10,6 +10,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   onAuthStateChanged, signOut, sendPasswordResetEmail, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, updatePassword, reauthenticateWithCredential, EmailAuthProvider,
   getAuth
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { initializeApp as initialiserAppSecondaire, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1122,6 +1123,7 @@ async function chargerMotsDePasse() {
         <td>${data.estSuperAdmin ? "Super Admin" : (data.role === "admin" ? "Admin" : "Client")}</td>
         <td>${formaterDate(data.derniereConnexion)}</td>
         <td>
+          <button class="bouton-mini-discret btn-changer-reel" data-id="${d.id}" data-email="${data.email}" data-mdp-actuel="${data.motDePasse || ""}">Changer</button>
           <button class="bouton-mini-discret btn-reinit" data-email="${data.email}">Lien de réinitialisation</button>
         </td>
       </tr>`;
@@ -1138,11 +1140,75 @@ async function chargerMotsDePasse() {
         }
       });
     });
+
+    document.querySelectorAll(".btn-changer-reel").forEach(bouton => {
+      bouton.addEventListener("click", async () => {
+        const { id, email, mdpActuel } = { id: bouton.dataset.id, email: bouton.dataset.email, mdpActuel: bouton.dataset.mdpActuel };
+        if (!mdpActuel) {
+          afficherBandeau("motsdepasse-bandeau", "Aucun mot de passe stocké pour ce compte — utilise le lien de réinitialisation à la place.", "erreur");
+          return;
+        }
+        const nouveau = window.prompt(`Nouveau mot de passe pour ${email} (6 caractères minimum) :`);
+        if (!nouveau) return;
+        if (nouveau.length < 6) {
+          afficherBandeau("motsdepasse-bandeau", "Le nouveau mot de passe doit faire au moins 6 caractères.", "erreur");
+          return;
+        }
+        const appSecondaire = initialiserAppSecondaire(firebaseConfig, "secondaire-mdp-" + Date.now());
+        const authSecondaire = getAuth(appSecondaire);
+        try {
+          await signInWithEmailAndPassword(authSecondaire, email, mdpActuel);
+          await updatePassword(authSecondaire.currentUser, nouveau);
+          await updateDoc(doc(db, "utilisateurs", id), { motDePasse: nouveau });
+          await deleteApp(appSecondaire);
+          afficherBandeau("motsdepasse-bandeau", `Mot de passe changé pour ${email}.`, "succes");
+          chargerMotsDePasse();
+        } catch (err) {
+          await deleteApp(appSecondaire);
+          console.error(err);
+          let message = "Erreur lors du changement de mot de passe.";
+          if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+            message = "Le mot de passe stocké ne correspond plus au vrai mot de passe de connexion (probablement changé par la personne elle-même) — utilise le lien de réinitialisation à la place.";
+          }
+          afficherBandeau("motsdepasse-bandeau", message, "erreur");
+        }
+      });
+    });
   } catch (err) {
     console.error(err);
     corps.innerHTML = `<tr><td colspan="6" class="message-vide">Erreur de chargement.</td></tr>`;
   }
 }
+
+// ---------- Changer mon mot de passe (auto-service, Firebase Authentication) ----------
+document.getElementById("btn-changer-mdp").addEventListener("click", async () => {
+  const ancien = document.getElementById("mdp-actuel").value;
+  const nouveau = document.getElementById("mdp-nouveau").value;
+  if (!ancien || !nouveau) {
+    afficherBandeau("changer-mdp-bandeau", "Renseigne ton mot de passe actuel et le nouveau.", "erreur");
+    return;
+  }
+  if (nouveau.length < 6) {
+    afficherBandeau("changer-mdp-bandeau", "Le nouveau mot de passe doit faire au moins 6 caractères.", "erreur");
+    return;
+  }
+  try {
+    const identifiants = EmailAuthProvider.credential(auth.currentUser.email, ancien);
+    await reauthenticateWithCredential(auth.currentUser, identifiants);
+    await updatePassword(auth.currentUser, nouveau);
+    // Met à jour la copie de confort affichée dans l'onglet Mots de passe
+    await updateDoc(doc(db, "utilisateurs", auth.currentUser.uid), { motDePasse: nouveau });
+    afficherBandeau("changer-mdp-bandeau", "Mot de passe changé avec succès.", "succes");
+    document.getElementById("mdp-actuel").value = "";
+    document.getElementById("mdp-nouveau").value = "";
+  } catch (err) {
+    console.error(err);
+    let message = "Erreur lors du changement de mot de passe.";
+    if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") message = "Mot de passe actuel incorrect.";
+    if (err.code === "auth/weak-password") message = "Le nouveau mot de passe est trop faible (6 caractères minimum).";
+    afficherBandeau("changer-mdp-bandeau", message, "erreur");
+  }
+});
 
 // ---------- Chargement initial ----------
 (async function initAdmin() {

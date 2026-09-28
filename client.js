@@ -8,7 +8,9 @@ import { afficherBandeau } from "./interface.js";
 import {
   collection, addDoc, getDocs, doc, getDoc, updateDoc, query, where, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // ---------- Garde d'accès (session pour l'affichage immédiat) ----------
 const utilisateurBrut = sessionStorage.getItem("mecadacty_utilisateur");
@@ -295,6 +297,36 @@ document.getElementById("btn-envoyer-avis").addEventListener("click", async () =
   } catch (err) {
     console.error(err);
     afficherBandeau("avis-client-bandeau", "Erreur lors de l'envoi de l'avis.", "erreur");
+  }
+});
+
+// ---------- Chargement initial ----------
+// ---------- Changer mon mot de passe (auto-service, Firebase Authentication) ----------
+document.getElementById("btn-changer-mdp").addEventListener("click", async () => {
+  const ancien = document.getElementById("mdp-actuel").value;
+  const nouveau = document.getElementById("mdp-nouveau").value;
+  if (!ancien || !nouveau) {
+    afficherBandeau("changer-mdp-bandeau", "Renseigne ton mot de passe actuel et le nouveau.", "erreur");
+    return;
+  }
+  if (nouveau.length < 6) {
+    afficherBandeau("changer-mdp-bandeau", "Le nouveau mot de passe doit faire au moins 6 caractères.", "erreur");
+    return;
+  }
+  try {
+    const identifiants = EmailAuthProvider.credential(auth.currentUser.email, ancien);
+    await reauthenticateWithCredential(auth.currentUser, identifiants);
+    await updatePassword(auth.currentUser, nouveau);
+    await updateDoc(doc(db, "utilisateurs", auth.currentUser.uid), { motDePasse: nouveau });
+    afficherBandeau("changer-mdp-bandeau", "Mot de passe changé avec succès.", "succes");
+    document.getElementById("mdp-actuel").value = "";
+    document.getElementById("mdp-nouveau").value = "";
+  } catch (err) {
+    console.error(err);
+    let message = "Erreur lors du changement de mot de passe.";
+    if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") message = "Mot de passe actuel incorrect.";
+    if (err.code === "auth/weak-password") message = "Le nouveau mot de passe est trop faible (6 caractères minimum).";
+    afficherBandeau("changer-mdp-bandeau", message, "erreur");
   }
 });
 
