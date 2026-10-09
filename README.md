@@ -1,6 +1,6 @@
 # mecadacty — Site internet
 
-Version : **V01-043**
+Version : **V01-045**
 
 ## Structure du dépôt GitHub
 Tous les fichiers sont à la racine (HTML, CSS, JS), avec un seul

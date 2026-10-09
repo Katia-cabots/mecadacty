@@ -116,10 +116,10 @@
 
       <div class="carte">
         <h3>Liste des clients</h3>
-        <table class="tableau-donnees" id="table-clients">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-clients">
           <thead><tr><th>Nom</th><th>Contact</th><th>Identifiant</th><th>Dernière connexion</th></tr></thead>
           <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
@@ -143,10 +143,10 @@
       </div>
       <div class="carte">
         <h3>Liste des services</h3>
-        <table class="tableau-donnees" id="table-services">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-services">
           <thead><tr><th>Titre</th><th>Texte</th><th>Visible</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
@@ -182,10 +182,10 @@
       </div>
       <div class="carte">
         <h3>Tous les dossiers</h3>
-        <table class="tableau-donnees" id="table-dossiers">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-dossiers">
           <thead><tr><th>Client</th><th>Type</th><th>Description</th><th>Statut</th></tr></thead>
           <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
@@ -214,10 +214,10 @@
       </div>
       <div class="carte">
         <h3>Historique (tous clients)</h3>
-        <table class="tableau-donnees" id="table-heures">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-heures">
           <thead><tr><th>Client</th><th>Date</th><th>Heures</th><th>Description</th><th></th></tr></thead>
           <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
@@ -225,10 +225,10 @@
       <h2>À facturer</h2>
       <p style="color:var(--texte-doux); font-size:0.9rem;">Résumé par client : heures prestées enregistrées et rendez-vous confirmés facturables — à utiliser comme base pour établir tes factures.</p>
       <div class="carte">
-        <table class="tableau-donnees" id="table-facturation">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-facturation">
           <thead><tr><th>Client</th><th>Total heures</th><th>RDV confirmés facturables</th></tr></thead>
           <tbody><tr><td colspan="3" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
@@ -253,30 +253,30 @@
       </div>
       <div class="carte">
         <h3>Tous les rendez-vous</h3>
-        <table class="tableau-donnees" id="table-rdv">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-rdv">
           <thead><tr><th>Client</th><th>Objet</th><th>Créneaux / Validation</th><th>Facturation</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
     <section class="app-onglet" id="onglet-inscriptions">
       <h2>Demandes d'inscription</h2>
       <div class="carte">
-        <table class="tableau-donnees" id="table-inscriptions">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-inscriptions">
           <thead><tr><th>Nom</th><th>Contact</th><th>Date</th><th>Statut</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
     <section class="app-onglet" id="onglet-messages">
       <h2>Formulaire de contact — messages reçus</h2>
       <div class="carte">
-        <table class="tableau-donnees" id="table-messages">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-messages">
           <thead><tr><th>Nom</th><th>Contact</th><th>Message</th><th>Date</th><th>Statut</th></tr></thead>
           <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
@@ -302,10 +302,10 @@
       <h2>Avis clients</h2>
       <p style="color:var(--texte-doux); font-size:0.9rem;">Valide un avis pour qu'il apparaisse sur la page publique "Ils parlent de nous". Choisis jusqu'à 3 avis validés à mettre "à la une" sur la page d'accueil.</p>
       <div class="carte">
-        <table class="tableau-donnees" id="table-avis">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-avis">
           <thead><tr><th>Client</th><th>Note</th><th>Avis</th><th>Statut</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="5" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
         <div id="avis-bandeau" class="bandeau"></div>
       </div>
     </section>
@@ -354,10 +354,10 @@
       </div>
       <div class="carte">
         <h3>Articles publiés</h3>
-        <table class="tableau-donnees" id="table-articles">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-articles">
           <thead><tr><th>Date</th><th>Titre</th><th>Visible</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="4" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
       </div>
     </section>
 
@@ -366,10 +366,10 @@
       <p style="color:var(--texte-doux); font-size:0.88rem;">Le bouton "Changer" fixe un vrai nouveau mot de passe de connexion (en utilisant celui déjà stocké pour s'identifier brièvement à la place de la personne). Si ça échoue, c'est que le mot de passe stocké est périmé — utilise alors le lien de réinitialisation par e-mail.</p>
       <p style="color:var(--texte-doux); font-size:0.88rem;">Le mot de passe affiché est une copie de confort, mise à jour automatiquement à chaque changement effectué depuis le site.</p>
       <div class="carte">
-        <table class="tableau-donnees" id="table-motsdepasse">
+        <div class="table-scroll"><table class="tableau-donnees" id="table-motsdepasse">
           <thead><tr><th>Nom</th><th>Identifiant</th><th>Mot de passe</th><th>Rôle</th><th>Dernière connexion</th><th>Action</th></tr></thead>
           <tbody><tr><td colspan="6" class="message-vide">Chargement...</td></tr></tbody>
-        </table>
+        </table></div>
         <div id="motsdepasse-bandeau" class="bandeau"></div>
       </div>
     </section>

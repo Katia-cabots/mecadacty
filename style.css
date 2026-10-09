@@ -211,26 +211,7 @@ nav.entete-nav a.actif {
   cursor: pointer;
 }
 
-@media (max-width: 760px) {
-  nav.entete-nav {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--blanc);
-    flex-direction: column;
-    gap: 0;
-    border-bottom: 1px solid var(--gris-clair);
-    align-items: stretch;
-  }
-  nav.entete-nav.ouvert { display: flex; }
-  nav.entete-nav a {
-    padding: 14px 24px;
-    border-bottom: 1px solid var(--gris-clair);
-  }
-  .menu-mobile-toggle { display: block; }
-}
+/* (menu mobile : voir bloc « Responsive smartphone » en fin de fichier) */
 
 /* ---------- Héros ---------- */
 .heros {
@@ -962,4 +943,108 @@ table.tableau-donnees th { color: var(--gris-ardoise); font-weight: 600; font-si
   .app-menu { width: 100%; display: flex; overflow-x: auto; padding: 8px; }
   .app-menu button, .app-menu a { width: auto; white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
   .app-menu button.actif, .app-menu a.actif, .app-menu button:hover, .app-menu a:hover { border-left: none; border-bottom-color: var(--or); }
+}
+
+/* Lien du badge HL vers Hexelya (aucun effet au survol) */
+.lien-logo-hl { display:inline-flex; flex-shrink:0; line-height:0; text-decoration:none; cursor:pointer; }
+
+
+/* ============================================================
+   Responsive smartphone / petit écran (V01-045)
+   ============================================================ */
+html { -webkit-text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+img { max-width: 100%; }
+
+/* Bouton accueil flottant : ne doit jamais recouvrir le menu */
+@media (min-width: 1021px) {
+  .entete-barre { padding-right: 64px; }
+}
+@media (max-width: 1020px) {
+  #bouton-accueil-global { display: none; }
+
+  .entete-barre { flex-wrap: nowrap; padding: 8px 16px; gap: 12px; }
+  .entete-marque { min-width: 0; flex: 1 1 auto; }
+  .logo-complet-accueil { height: 52px; max-width: 100%; object-fit: contain; }
+  .menu-mobile-toggle {
+    display: flex; align-items: center; justify-content: center;
+    flex: 0 0 auto; width: 44px; height: 44px; margin-left: auto;
+    border: 1px solid var(--gris-clair); border-radius: var(--rayon);
+    background: var(--blanc); font-size: 1.5rem; line-height: 1;
+  }
+  nav.entete-nav {
+    display: none; position: absolute; top: 100%; left: 0; right: 0;
+    background: var(--blanc); flex-direction: column; gap: 0; align-items: stretch;
+    border-bottom: 1px solid var(--gris-clair); box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+    max-height: calc(100vh - 70px); overflow-y: auto;
+  }
+  nav.entete-nav.ouvert { display: flex; }
+  nav.entete-nav a { padding: 14px 20px; border-bottom: 1px solid var(--gris-clair); }
+  nav.entete-nav a.bouton-connexion {
+    margin: 12px 16px; text-align: center; border-bottom: none; padding: 12px 18px;
+  }
+}
+
+@media (max-width: 560px) {
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.4rem; }
+  .container { padding: 0 16px; }
+  .heros { padding: 48px 16px; }
+  .section { padding: 40px 16px; }
+  .heros-actions { flex-direction: column; }
+  .heros-actions .bouton-primaire, .heros-actions .bouton-secondaire { text-align: center; }
+  .logo-complet-accueil { height: 44px; }
+  .entete-marque-bloc { padding: 4px 8px; }
+  .bloc-carte { padding: 18px; max-width: 100%; }
+  .grille-services, .grille-temoignages { grid-template-columns: 1fr; }
+  .bloc-presentation { gap: 20px; }
+  .bloc-presentation img.portrait { width: 160px; height: 160px; }
+  .bloc-presentation img.portrait.logo-presentation { width: 100%; max-width: 260px; }
+  .bloc-presentation .presentation-texte { min-width: 0; width: 100%; }
+  .bloc-presentation .presentation-texte p { text-align: left; }
+  .liste-atouts li { white-space: normal; font-size: 0.75rem; padding: 6px 8px; }
+  footer.pied { padding: 28px 16px 22px; }
+  .pied-tva, .pied-version { white-space: normal; }
+}
+
+/* Champs de formulaire : 16px évite le zoom automatique sur iPhone */
+@media (max-width: 760px) {
+  .champ input, .champ textarea, .champ select { font-size: 16px; padding: 12px; }
+  .bouton-mini, .bouton-mini-discret, .bouton-deconnexion { min-height: 40px; }
+}
+
+/* ---------- Espaces Admin / Client sur smartphone ---------- */
+.table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-scroll table.tableau-donnees { min-width: 560px; }
+
+@media (max-width: 760px) {
+  .app-entete { padding: 10px 14px; flex-wrap: nowrap; }
+  .app-entete-gauche { min-width: 0; gap: 10px; }
+  .app-entete-titre-bloc { min-width: 0; }
+  .app-entete-titre-bloc .salutation-entete { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 46vw; }
+  .app-entete-titre-bloc .version-tag { margin-left: 4px; }
+  .bouton-deconnexion { flex-shrink: 0; padding: 8px 10px; font-size: 0.8rem; }
+
+  .app-layout { min-height: 0; }
+  .app-menu {
+    position: sticky; top: 0; z-index: 40; gap: 2px; padding: 6px 8px;
+    border-right: none; border-bottom: 1px solid var(--gris-clair);
+    -webkit-overflow-scrolling: touch;
+  }
+  .app-menu button, .app-menu a { padding: 10px 12px; font-size: 0.85rem; flex: 0 0 auto; }
+
+  .app-contenu { padding: 16px 14px; min-width: 0; width: 100%; }
+  .carte { padding: 14px; }
+  .entete-onglet { flex-direction: column; align-items: stretch; }
+  .entete-onglet .bouton-mini, .entete-onglet .bouton-primaire { width: 100%; text-align: center; }
+  table.tableau-donnees th, table.tableau-donnees td { padding: 8px 8px; font-size: 0.82rem; }
+
+  .zone-envoi-message { flex-direction: column; }
+  .bulle-message { max-width: 90%; }
+  .message-complet-deplie { max-width: 100%; }
+}
+
+@media (max-width: 380px) {
+  .app-entete-titre-bloc .version-tag { display: block; margin: 2px 0 0 0; }
+  .logo-complet-accueil { height: 38px; }
 }
